@@ -1,0 +1,1 @@
+export { useTop10TablesWidget } from './useTop10TablesWidget';

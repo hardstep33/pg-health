@@ -1,0 +1,1 @@
+export { useCpuSizeWidget } from './useCpuSizeWidget';

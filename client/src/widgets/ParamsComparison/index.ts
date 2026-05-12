@@ -1,0 +1,1 @@
+export { useParamsComparisonWidget } from './useParamsComparisonWidget';

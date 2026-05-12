@@ -1,0 +1,1 @@
+export { useDeadTuplesWidget } from './useDeadTuplesWidget';

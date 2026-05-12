@@ -1,0 +1,1 @@
+export { useParamsRamSizeWidget } from './useParamsRamSizeWidget';

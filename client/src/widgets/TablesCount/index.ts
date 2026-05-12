@@ -1,0 +1,1 @@
+export { useTablesCountWidget } from './useTablesCountWidget';

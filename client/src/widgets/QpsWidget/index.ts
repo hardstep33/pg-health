@@ -1,0 +1,1 @@
+export { useQpsWidget } from './useQpsWidget';

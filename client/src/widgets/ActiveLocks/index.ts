@@ -1,0 +1,1 @@
+export { useActiveLocksWidget } from './useActiveLocksWidget';

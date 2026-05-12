@@ -1,0 +1,64 @@
+const BASE_URL = '/postgres-data';
+
+async function fetchJson(url: string, options?: RequestInit) {
+    const baseUrl = url.startsWith('/api/') ? '' : BASE_URL;
+    const res = await fetch(`${baseUrl}${url}`, options);
+    if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(errorText || `Ошибка ${res.status}`);
+    }
+    const json = await res.json();
+
+    if (json && typeof json === 'object') {
+        if (!Array.isArray(json) && json.exception) {
+            throw new Error(json.exception);
+        }
+        if (Array.isArray(json) && json.length > 0 && json[0]?.exception) {
+            throw new Error(json[0].exception);
+        }
+    }
+
+    return json;
+}
+
+// Состояние БД
+export const getDbSelected = () => fetchJson('/db/selected');
+export const getDbVersion = () => fetchJson('/db/version');
+export const getOsVersion = () => fetchJson('/os/version');
+export const getRamSize = () => fetchJson('/os/ram');
+export const getCpuSize = () => fetchJson('/os/cpu');
+export const getOsDiskIOWait = () => fetchJson('/os/disk/io_wait');
+export const getDiskPercentRead = () => fetchJson('/disk/read_percent');
+export const getDBIOInfo = () => fetchJson('/db/total_io');
+export const getTablesCount = () => fetchJson('/db/tables_count');
+export const getDbSizeAll = () => fetchJson('/db/size_all');
+export const getDbTop10Tables = () => fetchJson('/db/top10-tables');
+export const getDbDeadTuples = () => fetchJson('/db/dead_tuples_top_50');
+export const getDbInvalidIndexes = () => fetchJson('/db/invalid-indexes');
+export const getDbTopDiskReadQuery = () => fetchJson('/db/top-disk-read-queries');
+
+// Параметры Postgres
+export const getPostgresParams = () => fetchJson('/db/params');
+
+// Блокировки и транзакции
+export const getActiveLocks = () => fetchJson('/db/active-locks');
+export const getLongRunningQueries = (threshold?: number) =>
+    fetchJson(`/db/long-running-queries${threshold ? `?threshold=${threshold}` : ''}`);
+export const getIdleInTransaction = () => fetchJson('/db/idle-in-transaction');
+
+// Индексы
+export const getIndexStats = () => fetchJson('/db/index-stats');
+
+// Подключения
+export const getConnectionStats = () => fetchJson('/db/connection-stats');
+
+// Переключение подключений
+export const getConnections = () => fetchJson('/api/connections');
+export const switchConnection = (id: string) =>
+    fetchJson('/api/connections/switch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+    });
+/* Показатель QPS */
+export const getQPS = () => fetchJson('/db/qps');
