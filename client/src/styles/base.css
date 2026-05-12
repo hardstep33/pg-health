@@ -1,0 +1,237 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-ui, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* =============================================
+   Scrollbars
+   ============================================= */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* =============================================
+   Typography helpers
+   ============================================= */
+.value {
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  color: var(--accent-purple);
+  text-align: left;
+  display: block;
+  margin: 0;
+  padding-left: 2px;
+}
+
+.error {
+  color: var(--error-red);
+  font-size: 12px;
+}
+
+p {
+  margin: 0.5em 0;
+  color: var(--text-secondary);
+}
+
+.break-word {
+  word-break: break-word;
+  white-space: normal;
+}
+
+/* =============================================
+   Data tables
+   ============================================= */
+.table-wrapper {
+  /* No max-height or overflow here — widget-body is the single scroll container.
+     When the user resizes the card smaller, widget-body scrolls. */
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.82rem;
+}
+
+/* Правая и нижняя граница на всех ячейках */
+.data-table th,
+.data-table td {
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 6px 10px;
+  text-align: left;
+}
+
+/* Левая граница только у первой колонки */
+.data-table th:first-child,
+.data-table td:first-child {
+  border-left: 1px solid var(--border);
+}
+
+/* Верхняя граница только у шапки */
+.data-table thead th {
+  border-top: 1px solid var(--border);
+}
+
+/* Sticky на thead — весь блок целиком, а не отдельные ячейки.
+   Это гарантирует что thead рисуется поверх tbody при прокрутке. */
+.data-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.data-table th {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.data-table tbody tr:nth-child(odd) {
+  background-color: var(--bg-tertiary);
+}
+
+.data-table tbody tr:nth-child(even) {
+  background-color: var(--bg-secondary);
+}
+
+.data-table tbody tr:hover {
+  background-color: var(--hover-bg);
+}
+
+th.sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.15s;
+}
+
+th.sortable:hover {
+  background-color: var(--hover-bg);
+}
+
+.query-text {
+  max-width: 350px;
+  white-space: normal;
+  word-break: break-word;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+}
+
+.row-warning {
+  background-color: var(--warning-bg) !important;
+  color: var(--warning-text);
+}
+
+.row-ok {
+  background-color: var(--ok-bg) !important;
+  color: var(--ok-text);
+}
+
+.cell-warning {
+  background-color: var(--warning-bg) !important;
+  color: var(--warning-text);
+}
+
+.recommendation-cell {
+  white-space: pre-line;
+  text-align: left;
+}
+
+.table-footer {
+  font-weight: 700;
+  background-color: var(--footer-bg) !important;
+  color: var(--footer-text);
+}
+
+.table-footer td {
+  padding: 8px 10px;
+  text-align: left;
+}
+
+/* =============================================
+   Full-width widget (flexbox)
+   ============================================= */
+.widget.widget-full-width {
+  flex: none;
+  width: 100%;
+  min-width: 100%;
+}
+
+
+/* =============================================
+   Reference widget
+   ============================================= */
+.widget.reference-widget {
+  flex: none;
+  width: 100%;
+  min-width: 100%;
+}
+
+.widget.reference-widget .widget-header {
+  cursor: pointer;
+  user-select: none;
+}
+
+.widget.reference-widget .widget-header:hover {
+  background-color: var(--hover-bg);
+}
+
+.reference-widget code,
+.data-table code {
+  font-family: var(--font-mono);
+  background-color: var(--bg-primary);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.85rem;
+  color: var(--accent-purple);
+}
+
+/* =============================================
+   Top-10 list
+   ============================================= */
+.top-list {
+  list-style: decimal inside;
+  padding-left: 0;
+  font-size: 0.9rem;
+}
+
+.top-list li {
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.top-list li:last-child {
+  border-bottom: none;
+}
+
+.top-list li strong {
+  color: var(--accent-purple);
+}

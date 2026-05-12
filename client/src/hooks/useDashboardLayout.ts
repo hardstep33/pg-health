@@ -8,6 +8,7 @@ export interface WidgetInfo {
     onReload?: () => void;
     isLoading?: boolean;
     fullWidth?: boolean;
+    order?: number;
 }
 
 interface LayoutStorage {
@@ -15,40 +16,12 @@ interface LayoutStorage {
     sizes: Record<string, { width: number; height: number }>;
 }
 
-const DEFAULT_ORDER: Record<string, string[]> = {
-    'dashboard-db-state': [
-        'os-version',
-        'db-version',
-        'ram-size',
-        'cpu-size',
-        'database-size',
-        'qps-widget',
-        'connection-stats',
-        'dead-tuples',
-        'disk-io-wait',
-        'top-disk-read-queries',
-        'tables-count',
-        'top10-tables',
-        'disk-read-percent',
-        'database-io',
-    ],
-    'dashboard-postgres-params': [
-        'params-ram-size',
-        'params-cpu-size',
-        'params-db-size',
-        'params-comparison',
-        'params-reference',
-    ],
-    'dashboard-locks-transactions': [
-        'active-locks',
-        'long-running-queries',
-        'idle-in-transaction',
-    ],
-    'dashboard-indexes': [
-        'index-stats',
-        'invalid-indexes',
-    ],
-};
+function getDefaultOrder(widgets: WidgetInfo[]): string[] {
+    return [...widgets]
+        .map((w, i) => ({ id: w.id, order: w.order ?? i }))
+        .sort((a, b) => a.order - b.order)
+        .map(w => w.id);
+}
 
 function loadLayout(storageKey: string): LayoutStorage {
     try {
@@ -65,7 +38,7 @@ function loadLayout(storageKey: string): LayoutStorage {
     } catch (e) {
         console.warn('Failed to parse dashboard layout from localStorage', e);
     }
-    return { order: DEFAULT_ORDER[storageKey] || [], sizes: {} };
+    return { order: [], sizes: {} };
 }
 
 function saveLayout(storageKey: string, layout: LayoutStorage) {
@@ -78,7 +51,9 @@ export function useDashboardLayout(storageKey: string, widgets: WidgetInfo[]) {
         const knownIds = widgets.map(w => w.id);
         const filtered = saved.filter(id => knownIds.includes(id));
         const missing = knownIds.filter(id => !filtered.includes(id));
-        return [...filtered, ...missing];
+        const defaultOrder = getDefaultOrder(widgets);
+        const sortedMissing = defaultOrder.filter(id => missing.includes(id));
+        return [...filtered, ...sortedMissing];
     });
 
     const [sizes, setSizes] = useState<Record<string, { width: number; height: number }>>(
@@ -89,15 +64,34 @@ export function useDashboardLayout(storageKey: string, widgets: WidgetInfo[]) {
         saveLayout(storageKey, { order, sizes });
     }, [storageKey, order, sizes]);
 
-    const moveWidget = useCallback((dragId: string, hoverId: string) => {
+    const moveWidget = useCallback((dragId: string, targetId: string, position: 'before' | 'after' = 'before') => {
         setOrder(prev => {
-            const dragIndex = prev.indexOf(dragId);
-            const hoverIndex = prev.indexOf(hoverId);
-            if (dragIndex === -1 || hoverIndex === -1) return prev;
-            const newOrder = [...prev];
-            newOrder.splice(dragIndex, 1);
-            newOrder.splice(hoverIndex, 0, dragId);
-            return newOrder;
+            if (prev.indexOf(dragId) === -1 || prev.indexOf(targetId) === -1) return prev;
+            const next = [...prev];
+            next.splice(next.indexOf(dragId), 1);
+            const insertAt = position === 'before' ? next.indexOf(targetId) : next.indexOf(targetId) + 1;
+            next.splice(insertAt, 0, dragId);
+            return next;
+        });
+    }, []);
+
+    const moveUp = useCallback((id: string) => {
+        setOrder(prev => {
+            const idx = prev.indexOf(id);
+            if (idx <= 0) return prev;
+            const next = [...prev];
+            [next[idx - 1], next[idx]] = [next[idx], next[idx - 1]];
+            return next;
+        });
+    }, []);
+
+    const moveDown = useCallback((id: string) => {
+        setOrder(prev => {
+            const idx = prev.indexOf(id);
+            if (idx === -1 || idx >= prev.length - 1) return prev;
+            const next = [...prev];
+            [next[idx + 1], next[idx]] = [next[idx], next[idx + 1]];
+            return next;
         });
     }, []);
 
@@ -109,6 +103,8 @@ export function useDashboardLayout(storageKey: string, widgets: WidgetInfo[]) {
         order,
         sizes,
         moveWidget,
+        moveUp,
+        moveDown,
         updateWidgetSize,
     };
 }

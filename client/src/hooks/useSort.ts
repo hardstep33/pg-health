@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 
 export interface SortConfig {
     key: string | null;
@@ -10,11 +10,6 @@ export function useSort<T>(data: T[]) {
         key: null,
         direction: 'none',
     });
-
-    // При изменении данных (первая загрузка или перезагрузка) сбрасываем сортировку
-    useEffect(() => {
-        setSortConfig({ key: null, direction: 'none' });
-    }, [data]);
 
     const sortedData = useMemo(() => {
         if (!data || data.length === 0) return data;

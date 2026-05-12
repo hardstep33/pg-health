@@ -1,0 +1,43 @@
+.theme-switcher {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0 12px;
+}
+
+.theme-switcher-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--sidebar-section-text);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.theme-switcher-select {
+  background-color: rgba(255, 255, 255, 0.06);
+  color: var(--sidebar-text);
+  border: 1px solid var(--sidebar-border);
+  border-radius: 6px;
+  padding: 6px 28px 6px 8px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s, background-color 0.15s;
+  width: 100%;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238B9AB5' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+}
+
+.theme-switcher-select:hover,
+.theme-switcher-select:focus {
+  border-color: var(--sidebar-active-bg);
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.theme-switcher-select option {
+  background-color: var(--sidebar-bg);
+  color: var(--sidebar-logo-text);
+}

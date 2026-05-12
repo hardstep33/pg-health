@@ -1,0 +1,206 @@
+.widget {
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--card-radius);
+  min-width: 200px;
+  min-height: 100px;
+  width: var(--grid-min-col, 320px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  flex: none;
+  box-shadow: var(--card-shadow);
+  transition: box-shadow 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
+  resize: both;
+  position: relative;
+}
+
+.widget:hover {
+  box-shadow: var(--card-shadow-hover);
+}
+
+/* Source widget being dragged: ghost effect */
+.widget.is-dragging {
+  opacity: 0.35;
+  transform: scale(0.98);
+  box-shadow: none;
+}
+
+/* Drop indicator lines — box-shadow renders outside overflow:hidden */
+.widget.drop-before {
+  box-shadow: -4px 0 0 0 var(--accent-blue), var(--card-shadow);
+}
+
+.widget.drop-after {
+  box-shadow: 4px 0 0 0 var(--accent-blue), var(--card-shadow);
+}
+
+/* =============================================
+   Widget Header
+   ============================================= */
+.widget-header {
+  background-color: var(--bg-primary);
+  padding: 8px 10px 8px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  user-select: none;
+  letter-spacing: 0.1px;
+}
+
+.widget-drag-handle {
+  color: var(--text-secondary);
+  opacity: 0.5;
+  font-size: 16px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  cursor: grab;
+}
+
+.widget-drag-handle:active {
+  cursor: grabbing;
+}
+
+.widget-header .title {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.widget-order-btns {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-left: auto;
+}
+
+.widget-order-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 16px;
+  line-height: 1;
+  padding: 2px 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s;
+  opacity: 0.45;
+  flex-shrink: 0;
+}
+
+.widget-order-btn:hover {
+  color: var(--accent-blue);
+  opacity: 1;
+}
+
+.widget-order-btn:disabled {
+  opacity: 0.12;
+  cursor: default;
+}
+
+.widget-reload-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1;
+  padding: 3px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+
+.widget-reload-btn:hover {
+  background-color: var(--hover-bg);
+  color: var(--accent-blue);
+}
+
+.widget-reload-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* =============================================
+   Widget Body
+   ============================================= */
+.widget-body {
+  padding: 12px;
+  text-align: left;
+  flex: 1;
+  overflow: auto;
+  position: relative;
+}
+
+.widget-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--overlay-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  border-radius: 0 0 var(--card-radius) var(--card-radius);
+}
+
+/* =============================================
+   Spinner
+   ============================================= */
+.widget-spinner {
+  width: 28px;
+  height: 28px;
+  border: 2.5px solid var(--border);
+  border-top: 2.5px solid var(--accent-blue);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+/* =============================================
+   Custom Tooltip
+   ============================================= */
+.custom-tooltip {
+  position: fixed;
+  z-index: 9999;
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  max-width: 320px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  pointer-events: none;
+  white-space: normal;
+  word-wrap: break-word;
+  animation: fadeIn 0.1s ease;
+}
+
+.custom-tooltip b,
+.custom-tooltip strong {
+  color: var(--accent-purple);
+}
+
+.custom-tooltip i,
+.custom-tooltip em {
+  color: var(--accent-blue);
+}

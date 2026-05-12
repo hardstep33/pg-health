@@ -1,0 +1,283 @@
+/* =============================================
+   ТЕМА: Visual Studio (по умолчанию)
+   ============================================= */
+:root,
+[data-theme="visual-studio"] {
+  --bg-primary: #EEEEF2;
+  --bg-secondary: #F5F5F5;
+  --bg-tertiary: #FFFFFF;
+  --border: #D8D8DF;
+  --text-primary: #1E1E1E;
+  --text-secondary: #5A5A5A;
+  --accent-blue: #007ACC;
+  --accent-purple: #68217A;
+  --accent-green: #388A34;
+  --error-red: #E51400;
+  --hover-bg: #C9DEF5;
+  --overlay-bg: rgba(238, 238, 242, 0.92);
+  --scrollbar-thumb: #C1C1C1;
+  --scrollbar-track: #F1F1F1;
+  --warning-bg: #fce4e4;
+  --warning-text: #1E1E1E;
+  --ok-bg: #e8f5e9;
+  --ok-text: #1E1E1E;
+  --footer-bg: #e8f5e9;
+  --footer-text: inherit;
+
+  /* Sidebar — remains dark across all light themes */
+  --sidebar-bg: #1A2332;
+  --sidebar-text: #8B9AB5;
+  --sidebar-active-bg: #2563EB;
+  --sidebar-active-text: #FFFFFF;
+  --sidebar-hover-bg: rgba(255, 255, 255, 0.06);
+  --sidebar-section-text: #4D6280;
+  --sidebar-border: #2D3A4F;
+  --sidebar-logo-text: #FFFFFF;
+
+  /* Layout */
+  --sidebar-width: 240px;
+  --header-height: 56px;
+  --card-radius: 12px;
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --card-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.12);
+  --grid-gap: 16px;
+  --grid-min-col: 320px;
+  --content-padding: 20px;
+
+  /* Status colors */
+  --status-ok: #059669;
+  --status-warning: #D97706;
+  --status-critical: #DC2626;
+  --status-ok-bg: rgba(5, 150, 105, 0.08);
+  --status-warning-bg: rgba(217, 119, 6, 0.08);
+  --status-critical-bg: rgba(220, 38, 38, 0.08);
+}
+
+/* =============================================
+   ТЕМА: Light (светлая)
+   ============================================= */
+[data-theme="light"] {
+  --bg-primary: #F8F9FA;
+  --bg-secondary: #FFFFFF;
+  --bg-tertiary: #FFFFFF;
+  --border: #DEE2E6;
+  --text-primary: #212529;
+  --text-secondary: #6C757D;
+  --accent-blue: #0D6EFD;
+  --accent-purple: #6F42C1;
+  --accent-green: #198754;
+  --error-red: #DC3545;
+  --hover-bg: #E7F1FF;
+  --overlay-bg: rgba(248, 249, 250, 0.92);
+  --scrollbar-thumb: #ADB5BD;
+  --scrollbar-track: #E9ECEF;
+  --warning-bg: #f8d7da;
+  --warning-text: #58151c;
+  --ok-bg: #d1e7dd;
+  --ok-text: #0a3622;
+  --footer-bg: #d1e7dd;
+  --footer-text: inherit;
+
+  --sidebar-bg: #1A2332;
+  --sidebar-text: #8B9AB5;
+  --sidebar-active-bg: #2563EB;
+  --sidebar-active-text: #FFFFFF;
+  --sidebar-hover-bg: rgba(255, 255, 255, 0.06);
+  --sidebar-section-text: #4D6280;
+  --sidebar-border: #2D3A4F;
+  --sidebar-logo-text: #FFFFFF;
+
+  --sidebar-width: 240px;
+  --header-height: 56px;
+  --card-radius: 12px;
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --card-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.12);
+  --grid-gap: 16px;
+  --grid-min-col: 320px;
+  --content-padding: 20px;
+
+  --status-ok: #059669;
+  --status-warning: #D97706;
+  --status-critical: #DC2626;
+  --status-ok-bg: rgba(5, 150, 105, 0.08);
+  --status-warning-bg: rgba(217, 119, 6, 0.08);
+  --status-critical-bg: rgba(220, 38, 38, 0.08);
+}
+
+/* =============================================
+   ТЕМА: Dark (тёмная)
+   ============================================= */
+[data-theme="dark"] {
+  --bg-primary: #1A1D23;
+  --bg-secondary: #21252B;
+  --bg-tertiary: #282C34;
+  --border: #3E4452;
+  --text-primary: #ABB2BF;
+  --text-secondary: #7F848E;
+  --accent-blue: #61AFEF;
+  --accent-purple: #C678DD;
+  --accent-green: #98C379;
+  --error-red: #E06C75;
+  --hover-bg: #2C313A;
+  --overlay-bg: rgba(26, 29, 35, 0.92);
+  --scrollbar-thumb: #5A6377;
+  --scrollbar-track: #282C34;
+  --warning-bg: #2c1b1e;
+  --warning-text: #e06c75;
+  --ok-bg: #1b2e1b;
+  --ok-text: #98c379;
+  --footer-bg: #1b3b2d;
+  --footer-text: #ffffff;
+
+  --sidebar-bg: #0F1419;
+  --sidebar-text: #7A8A9E;
+  --sidebar-active-bg: #2563EB;
+  --sidebar-active-text: #FFFFFF;
+  --sidebar-hover-bg: rgba(255, 255, 255, 0.05);
+  --sidebar-section-text: #3D5070;
+  --sidebar-border: #1E2733;
+  --sidebar-logo-text: #FFFFFF;
+
+  --sidebar-width: 240px;
+  --header-height: 56px;
+  --card-radius: 12px;
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+  --card-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --grid-gap: 16px;
+  --grid-min-col: 320px;
+  --content-padding: 20px;
+
+  --status-ok: #34D399;
+  --status-warning: #FBBF24;
+  --status-critical: #F87171;
+  --status-ok-bg: rgba(52, 211, 153, 0.1);
+  --status-warning-bg: rgba(251, 191, 36, 0.1);
+  --status-critical-bg: rgba(248, 113, 113, 0.1);
+}
+
+/* =============================================
+   ТЕМА: High Contrast (высококонтрастная)
+   ============================================= */
+[data-theme="high-contrast"] {
+  --bg-primary: #000000;
+  --bg-secondary: #0D0D0D;
+  --bg-tertiary: #1A1A1A;
+  --border: #FFFFFF;
+  --text-primary: #FFFFFF;
+  --text-secondary: #FFFF00;
+  --accent-blue: #00FFFF;
+  --accent-purple: #FF00FF;
+  --accent-green: #00FF00;
+  --error-red: #FF0000;
+  --hover-bg: #333333;
+  --overlay-bg: rgba(0, 0, 0, 0.95);
+  --scrollbar-thumb: #FFFFFF;
+  --scrollbar-track: #0D0D0D;
+  --warning-bg: #000000;
+  --warning-text: #FF0000;
+  --ok-bg: #000000;
+  --ok-text: #00FF00;
+  --footer-bg: #004400;
+  --footer-text: #ffffff;
+
+  --sidebar-bg: #000000;
+  --sidebar-text: #FFFF00;
+  --sidebar-active-bg: #00FFFF;
+  --sidebar-active-text: #000000;
+  --sidebar-hover-bg: rgba(255, 255, 255, 0.1);
+  --sidebar-section-text: #808000;
+  --sidebar-border: #FFFFFF;
+  --sidebar-logo-text: #FFFFFF;
+
+  --sidebar-width: 240px;
+  --header-height: 56px;
+  --card-radius: 0px;
+  --card-shadow: none;
+  --card-shadow-hover: none;
+  --grid-gap: 16px;
+  --grid-min-col: 320px;
+  --content-padding: 20px;
+
+  --status-ok: #00FF00;
+  --status-warning: #FFFF00;
+  --status-critical: #FF0000;
+  --status-ok-bg: rgba(0, 255, 0, 0.1);
+  --status-warning-bg: rgba(255, 255, 0, 0.1);
+  --status-critical-bg: rgba(255, 0, 0, 0.1);
+}
+
+/* =============================================
+   ТЕМА: iOS (светлая + тёмная)
+   ============================================= */
+[data-theme="ios"] {
+  --bg-primary: #F2F2F7;
+  --bg-secondary: #FFFFFF;
+  --bg-tertiary: #FFFFFF;
+  --border: #C6C6C8;
+  --text-primary: #000000;
+  --text-secondary: #8E8E93;
+  --accent-blue: #007AFF;
+  --accent-purple: #AF52DE;
+  --accent-green: #34C759;
+  --error-red: #FF3B30;
+  --hover-bg: #E5E5EA;
+  --overlay-bg: rgba(242, 242, 247, 0.92);
+  --scrollbar-thumb: #C6C6C8;
+  --scrollbar-track: #F2F2F7;
+  --warning-bg: #FFE5E5;
+  --warning-text: #1E1E1E;
+  --ok-bg: #E5F9E7;
+  --ok-text: #1E1E1E;
+  --footer-bg: #E5F9E7;
+  --footer-text: inherit;
+
+  --sidebar-bg: #1C1C1E;
+  --sidebar-text: #8E8E93;
+  --sidebar-active-bg: #007AFF;
+  --sidebar-active-text: #FFFFFF;
+  --sidebar-hover-bg: rgba(255, 255, 255, 0.05);
+  --sidebar-section-text: #48484A;
+  --sidebar-border: #2C2C2E;
+  --sidebar-logo-text: #FFFFFF;
+
+  --sidebar-width: 240px;
+  --header-height: 56px;
+  --card-radius: 16px;
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --card-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --grid-gap: 16px;
+  --grid-min-col: 320px;
+  --content-padding: 20px;
+
+  --status-ok: #34C759;
+  --status-warning: #FF9500;
+  --status-critical: #FF3B30;
+  --status-ok-bg: rgba(52, 199, 89, 0.1);
+  --status-warning-bg: rgba(255, 149, 0, 0.1);
+  --status-critical-bg: rgba(255, 59, 48, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-theme="ios"] {
+    --bg-primary: #1C1C1E;
+    --bg-secondary: #2C2C2E;
+    --bg-tertiary: #3A3A3C;
+    --border: #545458;
+    --text-primary: #FFFFFF;
+    --text-secondary: #98989D;
+    --accent-blue: #0A84FF;
+    --accent-purple: #BF5AF2;
+    --accent-green: #30D158;
+    --error-red: #FF453A;
+    --hover-bg: #3A3A3C;
+    --overlay-bg: rgba(28, 28, 30, 0.92);
+    --scrollbar-thumb: #545458;
+    --scrollbar-track: #1C1C1E;
+    --warning-bg: #4A1C1C;
+    --warning-text: #FF453A;
+    --ok-bg: #1A3A1A;
+    --ok-text: #30D158;
+    --footer-bg: #1A3A1A;
+    --footer-text: #ffffff;
+  }
+}

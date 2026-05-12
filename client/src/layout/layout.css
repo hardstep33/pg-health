@@ -1,0 +1,402 @@
+/* =============================================
+   App Layout
+   ============================================= */
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.app-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  margin-left: var(--sidebar-width, 240px);
+}
+
+.app-content {
+  flex: 1;
+  overflow-y: auto;
+  background-color: var(--bg-primary);
+}
+
+/* =============================================
+   Sidebar
+   ============================================= */
+.sidebar {
+  width: var(--sidebar-width, 240px);
+  background-color: var(--sidebar-bg);
+  border-right: 1px solid var(--sidebar-border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  z-index: 200;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 16px 20px 16px;
+  border-bottom: 1px solid var(--sidebar-border);
+}
+
+.sidebar-logo-icon {
+  color: var(--sidebar-active-bg);
+  font-size: 22px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.sidebar-logo-text {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--sidebar-logo-text);
+  letter-spacing: 0.3px;
+  line-height: 1.2;
+}
+
+.sidebar-logo-sub {
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--sidebar-text);
+  letter-spacing: 0.3px;
+}
+
+/* Nav section */
+.sidebar-section {
+  padding: 16px 0 8px 0;
+}
+
+.sidebar-section-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--sidebar-section-text);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 0 16px 8px 16px;
+  display: block;
+}
+
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 16px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  color: var(--sidebar-text);
+  font-size: 0.88rem;
+  font-weight: 500;
+  font-family: inherit;
+  border-radius: 0;
+  transition: background-color 0.15s, color 0.15s;
+  position: relative;
+}
+
+.sidebar-nav-item:hover {
+  background-color: var(--sidebar-hover-bg);
+  color: #CBD5E1;
+}
+
+.sidebar-nav-item.active {
+  background-color: var(--sidebar-active-bg);
+  color: var(--sidebar-active-text);
+}
+
+.sidebar-nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background-color: var(--sidebar-active-text);
+  border-radius: 0 2px 2px 0;
+}
+
+.sidebar-nav-icon {
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+
+.sidebar-nav-item.active .sidebar-nav-icon {
+  opacity: 1;
+}
+
+/* Sidebar bottom tools */
+.sidebar-tools {
+  margin-top: auto;
+  border-top: 1px solid var(--sidebar-border);
+  padding: 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sidebar-tool-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--sidebar-section-text);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 0 12px;
+  display: block;
+}
+
+/* Connection selector in sidebar */
+.sidebar .connection-selector {
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0 12px;
+}
+
+.sidebar .connection-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--sidebar-section-text);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 4px;
+}
+
+.sidebar .connection-select {
+  background-color: rgba(255, 255, 255, 0.06);
+  color: var(--sidebar-text);
+  border: 1px solid var(--sidebar-border);
+  border-radius: 6px;
+  padding: 6px 28px 6px 8px;
+  font-size: 0.82rem;
+  width: 100%;
+  min-width: unset;
+  max-width: unset;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238B9AB5' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  outline: none;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.sidebar .connection-select:hover {
+  border-color: var(--sidebar-active-bg);
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar .connection-select:focus {
+  border-color: var(--sidebar-active-bg);
+}
+
+.sidebar .connection-select option {
+  background-color: var(--sidebar-bg);
+  color: var(--sidebar-logo-text);
+}
+
+.sidebar .connection-loading {
+  font-size: 0.8rem;
+  color: var(--sidebar-text);
+  padding: 0 12px;
+}
+
+/* =============================================
+   Header
+   ============================================= */
+.app-header {
+  height: var(--header-height, 56px);
+  background-color: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  flex-shrink: 0;
+}
+
+.app-header-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.app-header-sub {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-left: 8px;
+  font-weight: 400;
+}
+
+/* =============================================
+   Export Button (sidebar)
+   ============================================= */
+.export-pdf-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 12px;
+  padding: 8px 12px;
+  background: rgba(37, 99, 235, 0.12);
+  border: 1px solid rgba(37, 99, 235, 0.25);
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #93C5FD;
+  cursor: pointer;
+  width: calc(100% - 24px);
+  text-align: left;
+  font-family: inherit;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.export-pdf-btn:hover {
+  background: rgba(37, 99, 235, 0.2);
+  border-color: rgba(37, 99, 235, 0.4);
+  color: #BFDBFE;
+}
+
+.export-pdf-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.export-pdf-btn-icon {
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+}
+
+/* =============================================
+   Export Overlay
+   ============================================= */
+.export-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--overlay-bg);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.export-overlay-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  background-color: var(--bg-tertiary);
+  padding: 32px 40px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+/* =============================================
+   Connection Selector (global styles)
+   ============================================= */
+.connection-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.connection-label {
+  white-space: nowrap;
+}
+
+.connection-select {
+  font-family: inherit;
+  font-size: 0.85rem;
+  padding: 6px 28px 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  cursor: pointer;
+  min-width: 220px;
+  max-width: 350px;
+  transition: border-color 0.15s;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235A5A5A' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+}
+
+.connection-select:hover {
+  border-color: var(--accent-blue);
+}
+
+.connection-select:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.15);
+}
+
+.connection-select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.connection-loading {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* =============================================
+   Reset Layout Button (sidebar)
+   ============================================= */
+.reset-layout-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 12px;
+  padding: 7px 12px;
+  background: rgba(156, 163, 175, 0.08);
+  border: 1px solid rgba(156, 163, 175, 0.2);
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--sidebar-text);
+  cursor: pointer;
+  width: calc(100% - 24px);
+  text-align: left;
+  font-family: inherit;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.reset-layout-btn:hover {
+  background: rgba(156, 163, 175, 0.15);
+  border-color: rgba(156, 163, 175, 0.35);
+  color: #CBD5E1;
+}
+
+.reset-layout-btn-icon {
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  opacity: 0.7;
+}

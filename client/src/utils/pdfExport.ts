@@ -9,6 +9,15 @@ interface SavedElement {
 function prepareContainer(container: HTMLElement): () => void {
     const saved: SavedElement[] = [];
 
+    // Stack the dashboard vertically so widgets don't overlap when overflow is visible
+    const containerStyles: Record<string, string> = {
+        display: container.style.display,
+        flexWrap: container.style.flexWrap,
+        flexDirection: container.style.flexDirection,
+    };
+    saved.push({ el: container, styles: containerStyles });
+    container.style.display = 'block';
+
     const widgets = container.querySelectorAll<HTMLElement>('.widget');
     const bodies = container.querySelectorAll<HTMLElement>('.widget-body');
     const wrappers = container.querySelectorAll<HTMLElement>('.table-wrapper');
@@ -18,11 +27,17 @@ function prepareContainer(container: HTMLElement): () => void {
             height: el.style.height,
             width: el.style.width,
             overflow: el.style.overflow,
+            resize: el.style.resize,
+            flex: el.style.flex,
+            marginBottom: el.style.marginBottom,
         };
         saved.push({ el, styles });
+        el.style.width = '100%';
         el.style.height = 'auto';
-        el.style.width = 'auto';
         el.style.overflow = 'visible';
+        el.style.resize = 'none';
+        el.style.flex = 'none';
+        el.style.marginBottom = '16px';
     });
 
     bodies.forEach(el => {
@@ -49,9 +64,9 @@ function prepareContainer(container: HTMLElement): () => void {
         saved.forEach(({ el, styles }) => {
             Object.entries(styles).forEach(([prop, value]) => {
                 if (value) {
-                    el.style.setProperty(prop, value);
+                    (el.style as unknown as Record<string, string>)[prop] = value;
                 } else {
-                    el.style.removeProperty(prop);
+                    el.style.removeProperty(prop.replace(/([A-Z])/g, '-$1').toLowerCase());
                 }
             });
         });
