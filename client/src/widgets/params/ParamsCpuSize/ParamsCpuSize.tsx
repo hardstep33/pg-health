@@ -15,7 +15,7 @@ const ParamsCpuSize: React.FC<ParamsCpuSizeProps> = ({ cpuCores, error, errorToo
       </span>
         );
     }
-    return <span className="value">{formatInteger(cpuCores)} ядер</span>;
+    return <span className="value">{formatInteger(cpuCores)}</span>;
 };
 
 export default ParamsCpuSize;

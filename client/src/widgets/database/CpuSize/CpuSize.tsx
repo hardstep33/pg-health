@@ -16,7 +16,7 @@ const CpuSize: React.FC<CpuSizeProps> = ({ data, error, errorTooltip }) => {
         );
     }
     const cores = data?.[0]?.cpu_cores;
-    return <span className="value">{cores !== undefined ? `${formatInteger(cores)} ядер` : 'нет данных'}</span>;
+    return <span className="value">{cores !== undefined ? `${formatInteger(cores)}` : 'нет данных'}</span>;
 };
 
 export default CpuSize;

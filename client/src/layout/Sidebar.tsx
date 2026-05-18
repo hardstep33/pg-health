@@ -63,14 +63,6 @@ const Sidebar: React.FC<SidebarProps> = ({ activePage, onNavigate, onExportPdf, 
             <ConnectionSelector />
             <ThemeSwitcher />
             <ExportButton onClick={onExportPdf} disabled={isExporting} />
-            <button
-                className="reset-layout-btn"
-                onClick={onResetLayout}
-                title="Сбросить расположение виджетов на странице"
-            >
-                <span className="reset-layout-btn-icon"><RefreshIcon /></span>
-                Сбросить layout
-            </button>
         </div>
     </aside>
 );
