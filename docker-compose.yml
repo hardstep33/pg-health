@@ -9,14 +9,19 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - .:/app                      # Пробрасываем всю папку бэкенда для hot‑reload
-      - /app/node_modules           # Исключаем node_modules внутри контейнера
+      - .:/app
+      - /app/node_modules
     environment:
       - NODE_ENV=development
     env_file:
-      - .env                        # Передаём переменные окружения из корневого .env
+      - .env
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/health').then(r=>r.ok?process.exit(0):process.exit(1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
 
   frontend:
     build:
@@ -26,14 +31,15 @@ services:
     ports:
       - "3001:3001"
     volumes:
-      - ./client:/app               # Hot‑reload фронтенда
+      - ./client:/app
       - /app/node_modules
     environment:
       - NODE_ENV=development
     networks:
       - app-network
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
 
 networks:
   app-network:

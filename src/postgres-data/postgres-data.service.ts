@@ -1,139 +1,134 @@
-import { Injectable } from '@nestjs/common';
-import { ConnectionManagerService } from '../connection-manager/connection-manager.service';
-import { SqlQuery } from './queries'
+import { Injectable, Inject } from '@nestjs/common';
+import { DatabaseService } from '../database/database.service';
+import { SqlQuery } from './queries';
+import { CacheService } from '../cache/cache.service';
+import * as os from 'os';
+import { promises as fs } from 'fs';
 
 @Injectable()
 export class PostgresDataService {
-  constructor(private connectionManager: ConnectionManagerService) {}
+  constructor(
+      private dbService: DatabaseService,
+      private cacheService: CacheService,
+  ) {}
 
-  /* Обертка для парсинга запроса и вывода результатов */
   private async tryParse(query: string, params?: any[]) {
     try {
-      return await this.pgClient.query(query, params );
-    } catch (error) {
-      return {
-        data: '',
-        exception: error.message,
-        query: query
-      };
+      const rows = await this.dbService.query(query, params);
+      return rows;
+    } catch (error: any) {
+      return [{ exception: error.message }];
     }
   }
 
-  private get pgClient() {
-    return this.connectionManager.getCurrentDataSource();
+  // ---- Системные метрики (только RAM и CPU оставляем на Node.js, OS version возвращаем через SQL) ----
+  async getOsVersion() {
+    // Возвращаем версию ОС через SQL, как было изначально
+    const rows = await this.tryParse(SqlQuery.getOsVersion());
+    return rows;
   }
 
-  /* Получение строки подключенного сервера */
-  public getDbSelected() {
-    const list = this.connectionManager.getConnectionList();
-    const currentId = this.connectionManager.getCurrentId();
-    const current = list.find((c) => c.id === currentId);
-    if (current) {
-      return { selected: `${current.host}:${current.port}` };
+  async getRamSize() {
+    try {
+      const meminfo = await fs.readFile('/proc/meminfo', 'utf8');
+      const match = meminfo.match(/MemTotal:\s+(\d+)\s+kB/);
+      if (match) {
+        const totalKb = parseInt(match[1], 10);
+        const totalGb = totalKb / 1024 / 1024;
+        return [{ total_ram_gb: totalGb }];
+      }
+    } catch (e) {
+      // fallback
     }
-    return { selected: 'не выбрано' };
+    return [{ total_ram_gb: os.totalmem() / 1024 / 1024 / 1024 }];
   }
 
-  /* Получение версии БД */
-  public async getDbVersion() {
+  async getCpuSize() {
+    const cpus = os.cpus();
+    return [{ cpu_cores: cpus.length }];
+  }
+
+  // ---- Остальные методы используют SQL (не трогаем) ----
+  async getDbSelected() {
+    const list = this.dbService.getConnectionList();
+    const currentId = this.dbService.getCurrentId();
+    const current = list.find(c => c.id === currentId);
+    return { selected: current ? `${current.host}:${current.port}` : 'не выбрано' };
+  }
+
+  async getDbVersion() {
     return this.tryParse(SqlQuery.getVersion());
   }
 
-  /* Получение версии ОС */
-  public async getOsVersion() {
-    return this.tryParse(SqlQuery.getOsVersion());
-  }
-
-  /* Получение размера RAM */
-  public async getRamSize() {
-    return this.tryParse(SqlQuery.getRamSize());
-  }
-
-  /* Получение размера CPU */
-  public async getCpuSize() {
-    return this.tryParse(SqlQuery.getCpuSize());
-  }
-
-  /* Активные запросы, ожидающие диск (Текущий момент)
-   * Анализ: Если wait_event_type — IO, запрос уперся в скорость диска.
-   * */
-  public async getOsDiskIOWait() {
+  async getOsDiskIOWait() {
     return this.tryParse(SqlQuery.getOsDiskIOWait());
   }
 
-  /*Степень использования диска таблицами и индексами
-   * Запрос показывает количество блоков, прочитанных с диска (а не из кэша) для каждой таблицы.*/
-  public async getDiskPercentRead() {
+  async getDiskPercentRead() {
     return this.tryParse(SqlQuery.getDiskPercentRead());
   }
 
-  /*Статистика I/O по базе данных в целом*/
-  public async getDBIOInfo() {
+  async getDBIOInfo() {
     return this.tryParse(SqlQuery.getDBIOInfo());
   }
 
-  /* Список схем и количества таблиц */
-  public async getTablesCount() {
+  async getTablesCount() {
     return this.tryParse(SqlQuery.getTablesCount());
   }
 
-  /* Размер всей БД */
-  public async getDbSizeAll() {
+  async getDbSizeAll() {
     return this.tryParse(SqlQuery.getDbSizeAll());
   }
 
-  /* ТОП-10 таблиц по размеру */
-  public async getDbTop10Tables() {
+  async getDbTop10Tables() {
     return this.tryParse(SqlQuery.getDbTop10Tables());
   }
 
-  /* таблицы и их состояние по мертвым кортежам, состоянию автовакуума и прочему */
-  public async getDbDeadTuples() {
+  async getDbDeadTuples() {
     return this.tryParse(SqlQuery.getDbDeadTuples());
   }
 
-  /* Список недействительных индексов и их размер  */
-  public async getDbInvalidIndexes() {
+  async getDbInvalidIndexes() {
     return this.tryParse(SqlQuery.getDbInvalidIndexes());
   }
 
-  /* Тяжёлые запросы с чтением с диска   */
-  public async getDbTopDiskReadQuery() {
+  async getDbTopDiskReadQuery() {
     return this.tryParse(SqlQuery.getDbTopDiskReadQuery());
   }
 
-  /* Получение текущих параметров PostgreSQL */
-  public async getPostgresParams() {
-    return this.tryParse(SqlQuery.getPostgresParams());
+  async getPostgresParams() {
+    return this.cacheService.getOrSet('postgres_params', () => this.tryParse(SqlQuery.getPostgresParams()), 30000);
   }
 
-  /* Активные блокировки */
-  public async getActiveLocks() {
+  async getActiveLocks() {
     return this.tryParse(SqlQuery.getActiveLocks());
   }
 
-  /* Запросы, висящие дольше N секунд */
-  public async getLongRunningQueries(thresholdSeconds: number = 30) {
-    return this.tryParse(SqlQuery.getLongRunningQueries(),[thresholdSeconds]);
+  async getLongRunningQueries(thresholdSeconds: number = 30) {
+    return this.tryParse(SqlQuery.getLongRunningQueries(), [thresholdSeconds]);
   }
 
-  /* Транзакции в состоянии idle in transaction */
-  public async getIdleInTransaction() {
+  async getIdleInTransaction() {
     return this.tryParse(SqlQuery.getIdleInTransaction());
   }
 
-  /* Статистика использования индексов */
-  public async getIndexStats() {
+  async getIndexStats() {
     return this.tryParse(SqlQuery.getIndexStats());
   }
 
-  /* Статистика подключений */
-  public async getConnectionStats() {
+  async getConnectionStats() {
     return this.tryParse(SqlQuery.getConnectionStats());
   }
 
-  /* Показатель QPS (среднее количество запросов в секунду) */
-  public async getQPS() {
-    return this.tryParse(SqlQuery.getQPS());
+  async getQPS() {
+    const intervalMs = 2000;
+    const query = SqlQuery.getQPSFallback();
+    const rows1 = await this.dbService.query(query);
+    await new Promise(resolve => setTimeout(resolve, intervalMs));
+    const rows2 = await this.dbService.query(query);
+    const calls1 = rows1[0]?.total_calls || 0;
+    const calls2 = rows2[0]?.total_calls || 0;
+    const qps = (calls2 - calls1) / (intervalMs / 1000);
+    return [{ qps: Math.max(0, Math.round(qps)) }];
   }
 }

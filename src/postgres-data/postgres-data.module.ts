@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import PostgresDataController from './postgres-data.controller';
+import {PostgresDataController} from './postgres-data.controller';
 import { PostgresDataService } from './postgres-data.service';
 
 @Module({

@@ -2,17 +2,14 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Копируем файлы зависимостей
 COPY package*.json ./
-
-# Устанавливаем зависимости
 RUN npm ci
 
-# Копируем весь исходный код бэкенда
 COPY . .
 
-# Открываем порт 3000 (как в main.ts)
 EXPOSE 3000
 
-# Запускаем в dev‑режиме (следит за изменениями)
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD node -e "fetch('http://localhost:3000/health').then(r=>r.ok?process.exit(0):process.exit(1)).catch(()=>process.exit(1))"
+
 CMD ["npm", "run", "start:dev"]
