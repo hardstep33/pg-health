@@ -338,9 +338,26 @@ export class SqlQuery {
           WHERE dead_percent > 10
         ),
         invalid_indexes_stats AS (
-          SELECT count(*) AS invalid_indexes
-          FROM pg_index
-          WHERE NOT indisvalid
+            select count(*) as invalid_indexes from (
+                                     SELECT
+                                         i.schemaname AS schema_name,
+                                         i.relname AS table_name,
+                                         i.indexrelname AS index_name,
+                                         idx_scan,
+                                         idx_tup_read,
+                                         idx_tup_fetch,
+                                         pg_relation_size(indexrelid) AS index_size_bytes,
+                                         pg_size_pretty(pg_relation_size(indexrelid)) AS index_size_pretty,
+                                         idx_blks_read,
+                                         idx_blks_hit,
+                                         CASE
+                                             WHEN (idx_blks_read + idx_blks_hit) > 0
+                                                 THEN round(100.0 * idx_blks_hit / (idx_blks_read + idx_blks_hit), 2)
+                                             ELSE 0
+                                             END AS cache_hit_ratio
+                                     FROM pg_stat_user_indexes i
+                                              JOIN pg_statio_user_indexes si USING (indexrelid)
+                                     ORDER BY idx_scan, pg_relation_size(indexrelid) DESC) q
         ),
         cache_hit_ratio AS (
           SELECT
