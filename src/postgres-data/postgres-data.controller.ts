@@ -112,4 +112,21 @@ export class PostgresDataController {
   async getQPS() {
     return this.postgresDataService.getQPS();
   }
+
+  // Репликация
+  @Get('/replication/stats')
+  async getReplicationStats() {
+    return this.postgresDataService.getReplicationStats();
+  }
+
+  @Get('/replication/slots')
+  async getReplicationSlots() {
+    return this.postgresDataService.getReplicationSlots();
+  }
+
+  // Сводка
+  @Get('/db/dashboard-summary')
+  async getDashboardSummary() {
+    return this.postgresDataService.getDashboardSummary();
+  }
 }

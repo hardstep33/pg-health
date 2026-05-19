@@ -1,15 +1,16 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 import { SqlQuery } from './queries';
 import { CacheService } from '../cache/cache.service';
 import * as os from 'os';
 import { promises as fs } from 'fs';
+import { convertParamValue } from './param-utils'; // добавим утилиты
 
 @Injectable()
 export class PostgresDataService {
   constructor(
-      private dbService: DatabaseService,
-      private cacheService: CacheService,
+    private dbService: DatabaseService,
+    private cacheService: CacheService,
   ) {}
 
   private async tryParse(query: string, params?: any[]) {
@@ -21,9 +22,7 @@ export class PostgresDataService {
     }
   }
 
-  // ---- Системные метрики (только RAM и CPU оставляем на Node.js, OS version возвращаем через SQL) ----
   async getOsVersion() {
-    // Возвращаем версию ОС через SQL, как было изначально
     const rows = await this.tryParse(SqlQuery.getOsVersion());
     return rows;
   }
@@ -37,9 +36,7 @@ export class PostgresDataService {
         const totalGb = totalKb / 1024 / 1024;
         return [{ total_ram_gb: totalGb }];
       }
-    } catch (e) {
-      // fallback
-    }
+    } catch (e) {}
     return [{ total_ram_gb: os.totalmem() / 1024 / 1024 / 1024 }];
   }
 
@@ -48,7 +45,6 @@ export class PostgresDataService {
     return [{ cpu_cores: cpus.length }];
   }
 
-  // ---- Остальные методы используют SQL (не трогаем) ----
   async getDbSelected() {
     const list = this.dbService.getConnectionList();
     const currentId = this.dbService.getCurrentId();
@@ -130,5 +126,84 @@ export class PostgresDataService {
     const calls2 = rows2[0]?.total_calls || 0;
     const qps = (calls2 - calls1) / (intervalMs / 1000);
     return [{ qps: Math.max(0, Math.round(qps)) }];
+  }
+
+  // --- Репликация ---
+  async getReplicationStats() {
+    return this.tryParse(SqlQuery.getReplicationStats());
+  }
+
+  async getReplicationSlots() {
+    return this.tryParse(SqlQuery.getReplicationSlots());
+  }
+
+  // --- Сводка ---
+  async getDashboardSummary() {
+    const summaryRows = await this.tryParse(SqlQuery.getDashboardSummary());
+    const summary = summaryRows[0] || { high_dead_tuples: 0, invalid_indexes: 0, cache_hit_ratio: 0 };
+    // Для параметров с отклонением нужно вычислить
+    const paramsRows = await this.tryParse(SqlQuery.getParamsSummary());
+    const totalRam = await this.getRamSize();
+    const totalRamGb = totalRam[0]?.total_ram_gb || 0;
+    const cpuRows = await this.getCpuSize();
+    const cpuCores = cpuRows[0]?.cpu_cores || 0;
+    const totalRamBytes = totalRamGb * 1024 * 1024 * 1024;
+
+    const settingsMap: Record<string, any> = {};
+    (paramsRows as any[]).forEach(s => { settingsMap[s.name] = s; });
+
+    const getVal = (name: string): number => {
+      const s = settingsMap[name];
+      if (!s) return 0;
+      if (name === 'autovacuum_work_mem' && s.setting === '-1') return getVal('maintenance_work_mem');
+      return convertParamValue(s.setting, s.unit);
+    };
+
+    const maxConnections = getVal('max_connections') || 100;
+    const storageType = 'SSD';
+    let deviatedCount = 0;
+
+    // Список проверок (упрощённо, как в ParamsComparison)
+    const checks = [
+      { name: 'shared_buffers', current: getVal('shared_buffers'), recommended: totalRamBytes / 4 },
+      { name: 'effective_cache_size', current: getVal('effective_cache_size'), recommended: totalRamBytes * 0.75 },
+      { name: 'work_mem', current: getVal('work_mem'), recommended: totalRamGb > 0 ? Math.floor((totalRamBytes - Math.min(totalRamBytes * 0.25, 8*1024*1024*1024)) / maxConnections / 4) : 0 },
+      { name: 'maintenance_work_mem', current: getVal('maintenance_work_mem'), recommended: totalRamGb > 0 ? Math.min(totalRamBytes * 0.1, 1*1024*1024*1024) : 0 },
+      { name: 'max_connections', current: getVal('max_connections'), recommended: 200 },
+      { name: 'max_parallel_workers', current: getVal('max_parallel_workers'), recommended: cpuCores > 0 ? Math.min(cpuCores, 8) : 0 },
+      { name: 'max_parallel_workers_per_gather', current: getVal('max_parallel_workers_per_gather'), recommended: cpuCores > 0 ? Math.min(Math.floor(cpuCores / 2), 4) : 0 },
+      { name: 'max_parallel_maintenance_workers', current: getVal('max_parallel_maintenance_workers'), recommended: cpuCores > 0 ? Math.max(Math.floor(cpuCores * 0.25), 4) : 0 },
+      { name: 'max_worker_processes', current: getVal('max_worker_processes'), recommended: cpuCores },
+      { name: 'autovacuum_enabled', current: getVal('autovacuum_enabled'), recommended: 1 },
+      { name: 'autovacuum_max_workers', current: getVal('autovacuum_max_workers'), recommended: cpuCores > 0 ? Math.max(Math.ceil(cpuCores / 3), 1) : 0 },
+      { name: 'autovacuum_naptime', current: getVal('autovacuum_naptime'), recommended: 60 * 1000 },
+      { name: 'autovacuum_vacuum_cost_delay', current: getVal('autovacuum_vacuum_cost_delay'), recommended: storageType === 'SSD' ? 2 : 10 },
+      { name: 'autovacuum_vacuum_cost_limit', current: getVal('autovacuum_vacuum_cost_limit'), recommended: storageType === 'SSD' ? 2000 : 200 },
+      { name: 'autovacuum_work_mem', current: getVal('autovacuum_work_mem'), recommended: totalRamGb > 0 && cpuCores > 0 ? 256 * 1024 * 1024 : 0 },
+      { name: 'log_autovacuum_min_duration', current: getVal('log_autovacuum_min_duration'), recommended: 0 },
+      { name: 'autovacuum_vacuum_threshold', current: getVal('autovacuum_vacuum_threshold'), recommended: 50 },
+      { name: 'autovacuum_vacuum_scale_factor', current: getVal('autovacuum_vacuum_scale_factor'), recommended: 0.05 },
+      { name: 'autovacuum_analyze_threshold', current: getVal('autovacuum_analyze_threshold'), recommended: 50 },
+      { name: 'autovacuum_analyze_scale_factor', current: getVal('autovacuum_analyze_scale_factor'), recommended: 0.05 },
+    ];
+
+    for (const check of checks) {
+      if (check.recommended === 0) continue;
+      let isOk = false;
+      if (check.name === 'max_connections') isOk = true;
+      else if (check.name === 'log_autovacuum_min_duration') isOk = check.current === 0;
+      else {
+        const diff = Math.abs(check.current - check.recommended) / check.recommended;
+        isOk = diff < 0.2;
+      }
+      if (!isOk) deviatedCount++;
+    }
+
+    return {
+      high_dead_tuples: Number(summary.high_dead_tuples) || 0,
+      invalid_indexes: Number(summary.invalid_indexes) || 0,
+      deviated_params: deviatedCount,
+      cache_hit_ratio: Number(summary.cache_hit_ratio) || 0,
+    };
   }
 }

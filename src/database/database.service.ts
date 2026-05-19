@@ -1,6 +1,6 @@
-import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Pool, PoolClient } from 'pg';
+import { Pool } from 'pg';
 
 export interface DbConfig {
   id: string;
@@ -16,6 +16,7 @@ export interface DbConfig {
 export class DatabaseService implements OnModuleInit, OnModuleDestroy {
   private pools = new Map<string, Pool>();
   private currentId: string | null = null;
+  private readonly logger = new Logger(DatabaseService.name);
 
   constructor(private configService: ConfigService) {}
 
@@ -32,23 +33,23 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
         idleTimeoutMillis: 30000,
         max: 10,
       });
-      // Проверяем подключение
       try {
         const client = await pool.connect();
         client.release();
         this.pools.set(cfg.id, pool);
-        console.log(`Pool created for ${cfg.description} (${cfg.id})`);
+        this.logger.log(`Pool created for ${cfg.description} (${cfg.id})`);
         if (!this.currentId) this.currentId = cfg.id;
       } catch (err) {
-        console.error(`Failed to connect to ${cfg.description}:`, err.message);
+        this.logger.error(`Failed to connect to ${cfg.description}: ${err.message}`);
       }
     }
   }
 
   async onModuleDestroy() {
-    for (const pool of this.pools.values()) {
-      await pool.end();
-    }
+    this.logger.log('Closing all database pools...');
+    const closePromises = Array.from(this.pools.values()).map(pool => pool.end());
+    await Promise.allSettled(closePromises);
+    this.logger.log('All pools closed');
   }
 
   private getAllConfigs(): DbConfig[] {

@@ -4,19 +4,17 @@ export class SqlQuery {
         return `select version()`
     }
 
-    /* Получение версии ОС – оставляем как есть, но в сервисе переопределено */
+    /* Получение версии ОС */
     static getOsVersion(): string {
         return `SELECT substring(version() FROM '\\(([^)]+)\\)[^)]*$') AS os_version`;
     }
 
-    /* Получение размера RAM – оставляем, но не используется */
     static getRamSize(): string {
         return `SELECT round(split_part(split_part(meminfo, ':', 2), 'k', 1)::numeric / 1024 / 1024, 0) as total_ram_gb
            FROM unnest(string_to_array(pg_read_file('/proc/meminfo', 0, 10000), chr(10))) meminfo
            WHERE meminfo LIKE 'MemTotal%';`;
     }
 
-    /* Получение размера CPU – оставляем, но не используется */
     static getCpuSize(): string {
         return `SELECT
              count(*) as cpu_cores
@@ -294,8 +292,86 @@ export class SqlQuery {
         AND s.name = 'max_connections'`
     }
 
-    // Новый метод для QPS без pg_sleep
     static getQPSFallback(): string {
         return `SELECT sum(calls) AS total_calls FROM pg_stat_statements;`
+    }
+
+    // --- Репликация ---
+    static getReplicationStats(): string {
+        return `
+      SELECT
+        application_name,
+        client_addr,
+        state,
+        sync_state,
+        pg_wal_lsn_diff(pg_current_wal_lsn(), replay_lsn) AS replay_lag_bytes,
+        replay_lag,
+        flush_lag,
+        write_lag
+      FROM pg_stat_replication;
+      `
+    }
+
+    static getReplicationSlots(): string {
+        return `
+      SELECT
+        slot_name,
+        slot_type,
+        active,
+        pg_wal_lsn_diff(pg_current_wal_lsn(), restart_lsn) AS wal_retained_bytes,
+        active_pid
+      FROM pg_replication_slots;
+      `
+    }
+
+    // --- Сводка проблем и hit ratio ---
+    static getDashboardSummary(): string {
+        return `
+      WITH
+        dead_tuples_stats AS (
+          SELECT count(*) AS high_dead_tuples
+          FROM (
+            SELECT n_live_tup, n_dead_tup,
+              CASE WHEN n_live_tup > 0 THEN round(n_dead_tup * 100.0 / n_live_tup, 3) ELSE 0 END AS dead_percent
+            FROM pg_stat_user_tables
+          ) t
+          WHERE dead_percent > 10
+        ),
+        invalid_indexes_stats AS (
+          SELECT count(*) AS invalid_indexes
+          FROM pg_index
+          WHERE NOT indisvalid
+        ),
+        cache_hit_ratio AS (
+          SELECT
+            round(
+              100.0 * sum(blks_hit) / nullif(sum(blks_hit + blks_read), 0), 2
+            ) AS hit_ratio
+          FROM pg_stat_database
+          WHERE datname = current_database()
+        )
+      SELECT
+        (SELECT high_dead_tuples FROM dead_tuples_stats) AS high_dead_tuples,
+        (SELECT invalid_indexes FROM invalid_indexes_stats) AS invalid_indexes,
+        (SELECT hit_ratio FROM cache_hit_ratio) AS cache_hit_ratio;
+      `
+    }
+
+    // Для получения отклонений параметров используем отдельный запрос, но лучше переиспользовать ParamsComparison логику на бэкенде
+    // Сделаем эндпоинт /db/params-summary, который возвращает количество параметров с отклонением
+    static getParamsSummary(): string {
+        return `
+      SELECT name, setting, unit, boot_val
+      FROM pg_settings
+      WHERE name IN (
+        'shared_buffers', 'effective_cache_size', 'work_mem', 'maintenance_work_mem',
+        'max_connections', 'max_parallel_workers', 'max_parallel_workers_per_gather',
+        'max_parallel_maintenance_workers', 'max_worker_processes', 'autovacuum_enabled',
+        'autovacuum_max_workers', 'autovacuum_naptime', 'autovacuum_vacuum_cost_delay',
+        'autovacuum_vacuum_cost_limit', 'autovacuum_work_mem', 'log_autovacuum_min_duration',
+        'autovacuum_vacuum_threshold', 'autovacuum_vacuum_scale_factor',
+        'autovacuum_analyze_threshold', 'autovacuum_analyze_scale_factor', 'autovacuum'
+      );
+      `
     }
 }
