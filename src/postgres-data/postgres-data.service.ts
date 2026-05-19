@@ -118,13 +118,17 @@ export class PostgresDataService {
   async getQPS() {
     const intervalMs = 2000;
     const query = SqlQuery.getQPSFallback();
-    const rows1 = await this.dbService.query(query);
-    await new Promise(resolve => setTimeout(resolve, intervalMs));
-    const rows2 = await this.dbService.query(query);
-    const calls1 = rows1[0]?.total_calls || 0;
-    const calls2 = rows2[0]?.total_calls || 0;
-    const qps = (calls2 - calls1) / (intervalMs / 1000);
-    return [{ qps: Math.max(0, Math.round(qps)) }];
+    try {
+      const rows1 = await this.dbService.query(query);
+      await new Promise(resolve => setTimeout(resolve, intervalMs));
+      const rows2 = await this.dbService.query(query);
+      const calls1 = rows1[0]?.total_calls || 0;
+      const calls2 = rows2[0]?.total_calls || 0;
+      const qps = (calls2 - calls1) / (intervalMs / 1000);
+      return [{ qps: Math.max(0, Math.round(qps)) }];
+    } catch (error: any) {
+      return [{ exception: error.message }];
+    }
   }
 
   // --- Репликация ---

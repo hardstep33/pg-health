@@ -271,7 +271,8 @@ export class SqlQuery {
             END AS cache_hit_ratio
         FROM pg_stat_user_indexes i
                JOIN pg_statio_user_indexes si USING (indexrelid)
-        ORDER BY idx_scan, pg_relation_size(indexrelid) DESC`
+        where idx_scan = 0
+        ORDER BY pg_relation_size(indexrelid) DESC`
     }
 
     static getConnectionStats(): string {
