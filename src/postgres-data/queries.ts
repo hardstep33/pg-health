@@ -135,7 +135,8 @@ export class SqlQuery {
                st.tab_size_pretty  
         from stats st  
                  left join progress pr on st.table_schema = pr.table_name  
-        order by dead_percent desc nulls last`
+        order by dead_percent desc nulls last
+        limit 100`
     }
 
     static getDbInvalidIndexes():string {

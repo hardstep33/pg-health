@@ -1,16 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 import { SqlQuery } from './queries';
-import { CacheService } from '../cache/cache.service';
 import * as os from 'os';
 import { promises as fs } from 'fs';
-import { convertParamValue } from './param-utils'; // добавим утилиты
+import { convertParamValue } from './param-utils';
 
 @Injectable()
 export class PostgresDataService {
   constructor(
-    private dbService: DatabaseService,
-    private cacheService: CacheService,
+      private dbService: DatabaseService,
   ) {}
 
   private async tryParse(query: string, params?: any[]) {
@@ -93,7 +91,8 @@ export class PostgresDataService {
   }
 
   async getPostgresParams() {
-    return this.cacheService.getOrSet('postgres_params', () => this.tryParse(SqlQuery.getPostgresParams()), 30000);
+    // Кэширование убрано — всегда свежие данные
+    return this.tryParse(SqlQuery.getPostgresParams());
   }
 
   async getActiveLocks() {
@@ -141,7 +140,6 @@ export class PostgresDataService {
   async getDashboardSummary() {
     const summaryRows = await this.tryParse(SqlQuery.getDashboardSummary());
     const summary = summaryRows[0] || { high_dead_tuples: 0, invalid_indexes: 0, cache_hit_ratio: 0 };
-    // Для параметров с отклонением нужно вычислить
     const paramsRows = await this.tryParse(SqlQuery.getParamsSummary());
     const totalRam = await this.getRamSize();
     const totalRamGb = totalRam[0]?.total_ram_gb || 0;
@@ -163,7 +161,6 @@ export class PostgresDataService {
     const storageType = 'SSD';
     let deviatedCount = 0;
 
-    // Список проверок (упрощённо, как в ParamsComparison)
     const checks = [
       { name: 'shared_buffers', current: getVal('shared_buffers'), recommended: totalRamBytes / 4 },
       { name: 'effective_cache_size', current: getVal('effective_cache_size'), recommended: totalRamBytes * 0.75 },

@@ -6,14 +6,12 @@ import { PostgresDataModule } from './postgres-data/postgres-data.module';
 import { ConnectionManagerModule } from './connection-manager/connection-manager.module';
 import { DatabaseModule } from './database/database.module';
 import { AuthModule } from './auth/auth.module';
-import { CacheModule } from './cache/cache.module';
 import { HealthController } from './health/health.controller';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     DatabaseModule,
-    CacheModule,
     AuthModule,
     ConnectionManagerModule,
     PostgresDataModule,
