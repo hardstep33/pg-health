@@ -1,3 +1,4 @@
+/* Реализация пагинации для многостраничных таблиц */
 import React from 'react';
 import './pagination.css';
 

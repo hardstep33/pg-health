@@ -1,3 +1,4 @@
+/* Кнопка экспорта в PDF */
 import React from 'react';
 import { MdPictureAsPdf } from 'react-icons/md';
 

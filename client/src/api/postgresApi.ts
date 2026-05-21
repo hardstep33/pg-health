@@ -1,5 +1,8 @@
+/* Модуль привязки фронта к бэку */
+
 const BASE_URL = '/postgres-data';
 
+/* Общий метод для привязки */
 async function fetchJson(url: string, options?: RequestInit) {
     const baseUrl = url.startsWith('/api/') ? '' : BASE_URL;
     const res = await fetch(`${baseUrl}${url}`, options);
@@ -19,7 +22,7 @@ async function fetchJson(url: string, options?: RequestInit) {
     return json;
 }
 
-// Существующие экспорты (без изменений) ...
+// Мапим имя метода к API на бэке
 export const getDbSelected = () => fetchJson('/db/selected');
 export const getDbVersion = () => fetchJson('/db/version');
 export const getOsVersion = () => fetchJson('/os/version');
@@ -43,13 +46,9 @@ export const getConnectionStats = () => fetchJson('/db/connection-stats');
 export const getConnections = () => fetchJson('/api/connections');
 export const switchConnection = (id: string) => fetchJson('/api/connections/switch', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
 export const getQPS = () => fetchJson('/db/qps');
-
-// Новые API
 export const getReplicationStats = () => fetchJson('/replication/stats');
 export const getReplicationSlots = () => fetchJson('/replication/slots');
 export const getDashboardSummary = () => fetchJson('/db/dashboard-summary');
-
-
 export const executeCustomQuery = (query: string) =>
     fetchJson('/custom-query', {
         method: 'POST',

@@ -1,3 +1,5 @@
+/* Виджет "Сводка проблем" */
+
 import React, { useEffect, useState } from 'react';
 import { getDashboardSummary } from '../../api/postgresApi';
 import './dashboard-summary.css';
