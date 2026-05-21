@@ -1,4 +1,4 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import {Body, Controller, Get, Post, Query, UseGuards} from '@nestjs/common';
 import { PostgresDataService } from './postgres-data.service';
 import { AuthGuard } from '../auth/auth.guard';
 
@@ -89,7 +89,10 @@ export class PostgresDataController {
 
   @Get('/db/long-running-queries')
   async getLongRunningQueries(@Query('threshold') threshold?: string) {
-    const thresholdSeconds = threshold ? parseInt(threshold, 10) : 30;
+    let thresholdSeconds = threshold ? parseInt(threshold, 10) : 30;
+    if (thresholdSeconds > 30) {
+      thresholdSeconds = 30;
+    }
     return this.postgresDataService.getLongRunningQueries(thresholdSeconds);
   }
 
@@ -128,5 +131,10 @@ export class PostgresDataController {
   @Get('/db/dashboard-summary')
   async getDashboardSummary() {
     return this.postgresDataService.getDashboardSummary();
+  }
+
+  @Post('/custom-query')
+  async executeCustomQuery(@Body('query') query: string) {
+    return this.postgresDataService.executeCustomQuery(query);
   }
 }

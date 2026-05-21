@@ -26,21 +26,11 @@ export class PostgresDataService {
   }
 
   async getRamSize() {
-    try {
-      const meminfo = await fs.readFile('/proc/meminfo', 'utf8');
-      const match = meminfo.match(/MemTotal:\s+(\d+)\s+kB/);
-      if (match) {
-        const totalKb = parseInt(match[1], 10);
-        const totalGb = totalKb / 1024 / 1024;
-        return [{ total_ram_gb: totalGb }];
-      }
-    } catch (e) {}
-    return [{ total_ram_gb: os.totalmem() / 1024 / 1024 / 1024 }];
+    return this.tryParse(SqlQuery.getRamSize());
   }
 
   async getCpuSize() {
-    const cpus = os.cpus();
-    return [{ cpu_cores: cpus.length }];
+    return this.tryParse(SqlQuery.getCpuSize());
   }
 
   async getDbSelected() {
@@ -206,5 +196,35 @@ export class PostgresDataService {
       deviated_params: deviatedCount,
       cache_hit_ratio: Number(summary.cache_hit_ratio) || 0,
     };
+  }
+
+  async executeCustomQuery(query: string) {
+    // Проверка на запрещённые операторы (независимо от регистра)
+    const forbiddenKeywords = ['create', 'insert', 'update', 'delete', 'drop', 'truncate',
+      'alter', 'grant', 'revoke', 'copy', 'load', 'do', 'call',
+      'vacuum', 'reindex', 'select into', 'create or replace', 'comment', 'security label',
+      'import foreign schema', 'set', 'reset', 'prepare', 'release savepoint', 'abort', 'rollback', 'refresh', 'execute'
+    ];
+    const lowerQuery = query.toLowerCase();
+    for (const keyword of forbiddenKeywords) {
+      if (lowerQuery.includes(keyword)) {
+        return { error: `Запрещён оператор: ${keyword.toUpperCase()}. Разрешены только SELECT запросы.` };
+      }
+    }
+
+    if (!lowerQuery.includes('limit 10')) {
+      return { error: `Разрешены только SELECT запросы c указанием limit 10 (в одну строку)` };
+    }
+    // Дополнительно убедимся, что первый оператор SELECT / WITH
+    const trimmed = query.trim().toLowerCase();
+    if (!trimmed.startsWith('select') && !trimmed.startsWith('with')) {
+      return { error: 'Разрешены только SELECT запросы (в том числе с CTE).' };
+    }
+    try {
+      const result = await this.dbService.query(query);
+      return { rows: result, rowCount: result.length };
+    } catch (error: any) {
+      return { error: error.message };
+    }
   }
 }
