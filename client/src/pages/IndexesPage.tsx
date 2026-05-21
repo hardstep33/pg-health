@@ -17,6 +17,7 @@ const IndexesPage: React.FC = () => {
             onReload: invalidIndexes.reload,
             isLoading: invalidIndexes.isLoading,
             fullWidth: true,
+            order: 1,
         },
         {
             id: 'index-stats',
@@ -26,6 +27,7 @@ const IndexesPage: React.FC = () => {
             onReload: indexStats.reload,
             isLoading: indexStats.isLoading,
             fullWidth: true,
+            order: 2,
         },
     ];
 

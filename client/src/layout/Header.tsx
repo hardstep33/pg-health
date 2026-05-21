@@ -6,6 +6,7 @@ const pageTitles: Record<PageName, string> = {
     'postgres-params':     'Параметры PostgreSQL',
     'locks-transactions':  'Блокировки и транзакции',
     'indexes':             'Анализ индексов',
+    'replication':         'Репликация',
 };
 
 interface HeaderProps {

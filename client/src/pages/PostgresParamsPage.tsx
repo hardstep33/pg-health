@@ -19,21 +19,21 @@ const PostgresParamsPage: React.FC = () => {
 
     const widgets: WidgetInfo[] = [
         {
-            id: 'params-ram-size',
-            title: 'Объём RAM',
-            tooltip: 'Используется для расчёта shared_buffers, effective_cache_size, work_mem',
-            component: <ParamsRamSize totalRamGb={paramsRam.totalRamGb} error={paramsRam.error} errorTooltip={paramsRam.errorTooltip} />,
-            onReload: paramsRam.reload,
-            isLoading: paramsRam.isLoading,
-            order: 1,
-        },
-        {
             id: 'params-cpu-size',
             title: 'Количество CPU',
             tooltip: 'Используется для расчёта max_parallel_workers и autovacuum_max_workers',
             component: <ParamsCpuSize cpuCores={paramsCpu.cpuCores} error={paramsCpu.error} errorTooltip={paramsCpu.errorTooltip} />,
             onReload: paramsCpu.reload,
             isLoading: paramsCpu.isLoading,
+            order: 1,
+        },
+        {
+            id: 'params-ram-size',
+            title: 'Объём RAM',
+            tooltip: 'Используется для расчёта shared_buffers, effective_cache_size, work_mem',
+            component: <ParamsRamSize totalRamGb={paramsRam.totalRamGb} error={paramsRam.error} errorTooltip={paramsRam.errorTooltip} />,
+            onReload: paramsRam.reload,
+            isLoading: paramsRam.isLoading,
             order: 2,
         },
         {
@@ -48,7 +48,7 @@ const PostgresParamsPage: React.FC = () => {
         {
             id: 'params-comparison',
             title: 'Сравнение параметров',
-            tooltip: 'Сравнение текущих значений параметров PostgreSQL с рекомендуемыми',
+            tooltip: 'Сравнение текущих значений PostgreSQL с рекомендуемыми',
             component: (
                 <ParamsComparison
                     data={paramsComparison.data}

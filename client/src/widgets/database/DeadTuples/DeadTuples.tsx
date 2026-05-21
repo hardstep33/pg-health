@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { formatInteger, formatPercent } from '../../../utils/formatNumber';
 import { useSort } from '../../../hooks/useSort';
+import { paginate, getTotalPages } from '../../../utils/pagination';
+import Pagination from '../../../components/Pagination/Pagination';
 
 interface DeadTupleRow {
     table_schema: string;
@@ -26,75 +28,49 @@ interface DeadTuplesProps {
 }
 
 const formatDate = (d: string | null) => (d ? new Date(d).toLocaleString('ru-RU') : '—');
+const PAGE_SIZE = 20;
 
 const DeadTuples: React.FC<DeadTuplesProps> = ({ data, error, errorTooltip }) => {
     const { sortedData, requestSort, getSortIndicator } = useSort(data || []);
+    const [currentPage, setCurrentPage] = useState(1);
 
     if (error) {
-        return (
-            <span className="error" title={errorTooltip || error}>
-        нет данных
-      </span>
-        );
+        return <span className="error" title={errorTooltip || error}>{error}</span>;
     }
-    if (!data) return null;
+    if (!data || data.length === 0) return <p>Нет данных о мёртвых кортежах</p>;
+
+    const totalPages = getTotalPages(sortedData.length, PAGE_SIZE);
+    const paginatedData = paginate(sortedData, currentPage, PAGE_SIZE);
+
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+    };
 
     return (
         <div className="table-wrapper">
             <table className="data-table">
                 <thead>
                 <tr>
-                    <th className="sortable" onClick={() => requestSort('table_schema')}>
-                        Таблица{getSortIndicator('table_schema')}
-                    </th>
-                    <th className="sortable" onClick={() => requestSort('n_live_tup')}>
-                        Живых строк{getSortIndicator('n_live_tup')}
-                    </th>
-                    <th className="sortable" onClick={() => requestSort('n_dead_tup')}>
-                        Мёртвых строк{getSortIndicator('n_dead_tup')}
-                    </th>
-                    <th className="sortable" onClick={() => requestSort('dead_percent')}>
-                        % мёртвых{getSortIndicator('dead_percent')}
-                    </th>
-                    <th className="sortable" onClick={() => requestSort('phase')}>
-                        Фаза vacuum{getSortIndicator('phase')}
-                    </th>
-                    <th className="sortable" onClick={() => requestSort('heap_blks_total')}>
-                        Блоков всего{getSortIndicator('heap_blks_total')}
-                    </th>
-                    <th className="sortable" onClick={() => requestSort('heap_blks_scanned')}>
-                        Просканировано{getSortIndicator('heap_blks_scanned')}
-                    </th>
-                    <th className="sortable" onClick={() => requestSort('heap_blks_vacuumed')}>
-                        Обработано vacuum{getSortIndicator('heap_blks_vacuumed')}
-                    </th>
-                    <th className="sortable" onClick={() => requestSort('index_vacuum_count')}>
-                        Индексов{getSortIndicator('index_vacuum_count')}
-                    </th>
-                    <th className="sortable" onClick={() => requestSort('last_autovacuum')}>
-                        Последний autovacuum{getSortIndicator('last_autovacuum')}
-                    </th>
-                    <th className="sortable" onClick={() => requestSort('last_autoanalyze')}>
-                        Последний autoanalyze{getSortIndicator('last_autoanalyze')}
-                    </th>
-                    <th className="sortable" onClick={() => requestSort('last_vacuum')}>
-                        Последний vacuum{getSortIndicator('last_vacuum')}
-                    </th>
-                    <th className="sortable" onClick={() => requestSort('last_analyze')}>
-                        Последний analyze{getSortIndicator('last_analyze')}
-                    </th>
-                    <th className="sortable" onClick={() => requestSort('tab_size_pretty')}>
-                        Размер{getSortIndicator('tab_size_pretty')}
-                    </th>
+                    <th className="sortable" onClick={() => requestSort('table_schema')}>Таблица{getSortIndicator('table_schema')}</th>
+                    <th className="sortable" onClick={() => requestSort('n_live_tup')}>Живых строк{getSortIndicator('n_live_tup')}</th>
+                    <th className="sortable" onClick={() => requestSort('n_dead_tup')}>Мёртвых строк{getSortIndicator('n_dead_tup')}</th>
+                    <th className="sortable" onClick={() => requestSort('dead_percent')}>% мёртвых{getSortIndicator('dead_percent')}</th>
+                    <th className="sortable" onClick={() => requestSort('phase')}>Фаза vacuum{getSortIndicator('phase')}</th>
+                    <th className="sortable" onClick={() => requestSort('heap_blks_total')}>Блоков всего{getSortIndicator('heap_blks_total')}</th>
+                    <th className="sortable" onClick={() => requestSort('heap_blks_scanned')}>Просканировано{getSortIndicator('heap_blks_scanned')}</th>
+                    <th className="sortable" onClick={() => requestSort('heap_blks_vacuumed')}>Обработано vacuum{getSortIndicator('heap_blks_vacuumed')}</th>
+                    <th className="sortable" onClick={() => requestSort('index_vacuum_count')}>Индексов{getSortIndicator('index_vacuum_count')}</th>
+                    <th className="sortable" onClick={() => requestSort('last_autovacuum')}>Последний autovacuum{getSortIndicator('last_autovacuum')}</th>
+                    <th className="sortable" onClick={() => requestSort('last_autoanalyze')}>Последний autoanalyze{getSortIndicator('last_autoanalyze')}</th>
+                    <th className="sortable" onClick={() => requestSort('last_vacuum')}>Последний vacuum{getSortIndicator('last_vacuum')}</th>
+                    <th className="sortable" onClick={() => requestSort('last_analyze')}>Последний analyze{getSortIndicator('last_analyze')}</th>
+                    <th className="sortable" onClick={() => requestSort('tab_size_pretty')}>Размер{getSortIndicator('tab_size_pretty')}</th>
                 </tr>
                 </thead>
                 <tbody>
-                {sortedData.map((row, idx) => {
-                    const deadPercentNum = typeof row.dead_percent === 'string'
-                        ? parseFloat(row.dead_percent)
-                        : row.dead_percent;
+                {paginatedData.map((row, idx) => {
+                    const deadPercentNum = typeof row.dead_percent === 'string' ? parseFloat(row.dead_percent) : row.dead_percent;
                     const isHighDead = deadPercentNum > 10;
-
                     return (
                         <tr key={row.table_schema + idx} className={isHighDead ? 'row-warning' : ''}>
                             <td>{row.table_schema}</td>
@@ -116,6 +92,7 @@ const DeadTuples: React.FC<DeadTuplesProps> = ({ data, error, errorTooltip }) =>
                 })}
                 </tbody>
             </table>
+            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
         </div>
     );
 };

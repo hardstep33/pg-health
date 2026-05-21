@@ -1,5 +1,5 @@
 /* =============================================
-   ТЕМА: Visual Studio (по умолчанию)
+   ТЕМА: Visual Studio (по умолчанию) — стилизация как в реальной VS
    ============================================= */
 :root,
 [data-theme="visual-studio"] {
@@ -24,17 +24,16 @@
   --footer-bg: #e8f5e9;
   --footer-text: inherit;
 
-  /* Sidebar — remains dark across all light themes */
-  --sidebar-bg: #1A2332;
-  --sidebar-text: #8B9AB5;
-  --sidebar-active-bg: #2563EB;
+  /* Sidebar — полностью как в Visual Studio (тёмно-серая) */
+  --sidebar-bg: #2D2D30;
+  --sidebar-text: #DCDCDC;
+  --sidebar-active-bg: #3E3E42;
   --sidebar-active-text: #FFFFFF;
-  --sidebar-hover-bg: rgba(255, 255, 255, 0.06);
-  --sidebar-section-text: #4D6280;
-  --sidebar-border: #2D3A4F;
+  --sidebar-hover-bg: #3E3E42;
+  --sidebar-section-text: #ADADAD;
+  --sidebar-border: #1E1E1E;
   --sidebar-logo-text: #FFFFFF;
 
-  /* Layout */
   --sidebar-width: 240px;
   --header-height: 56px;
   --card-radius: 12px;
@@ -44,7 +43,6 @@
   --grid-min-col: 320px;
   --content-padding: 20px;
 
-  /* Status colors */
   --status-ok: #059669;
   --status-warning: #D97706;
   --status-critical: #DC2626;
@@ -54,7 +52,7 @@
 }
 
 /* =============================================
-   ТЕМА: Light (светлая)
+   ТЕМА: Light (светлая) — сайдбар светлый
    ============================================= */
 [data-theme="light"] {
   --bg-primary: #F8F9FA;
@@ -78,14 +76,14 @@
   --footer-bg: #d1e7dd;
   --footer-text: inherit;
 
-  --sidebar-bg: #1A2332;
-  --sidebar-text: #8B9AB5;
-  --sidebar-active-bg: #2563EB;
+  --sidebar-bg: #F1F3F5;
+  --sidebar-text: #495057;
+  --sidebar-active-bg: #0D6EFD;
   --sidebar-active-text: #FFFFFF;
-  --sidebar-hover-bg: rgba(255, 255, 255, 0.06);
-  --sidebar-section-text: #4D6280;
-  --sidebar-border: #2D3A4F;
-  --sidebar-logo-text: #FFFFFF;
+  --sidebar-hover-bg: rgba(0, 0, 0, 0.05);
+  --sidebar-section-text: #6C757D;
+  --sidebar-border: #DEE2E6;
+  --sidebar-logo-text: #212529;
 
   --sidebar-width: 240px;
   --header-height: 56px;
@@ -105,7 +103,7 @@
 }
 
 /* =============================================
-   ТЕМА: Dark (тёмная)
+   ТЕМА: Dark (тёмная) — сайдбар почти чёрный
    ============================================= */
 [data-theme="dark"] {
   --bg-primary: #1A1D23;
@@ -131,8 +129,8 @@
 
   --sidebar-bg: #0F1419;
   --sidebar-text: #7A8A9E;
-  --sidebar-active-bg: #2563EB;
-  --sidebar-active-text: #FFFFFF;
+  --sidebar-active-bg: #61AFEF;
+  --sidebar-active-text: #1A1D23;
   --sidebar-hover-bg: rgba(255, 255, 255, 0.05);
   --sidebar-section-text: #3D5070;
   --sidebar-border: #1E2733;
@@ -207,7 +205,7 @@
 }
 
 /* =============================================
-   ТЕМА: iOS (светлая + тёмная)
+   ТЕМА: iOS (адаптивная)
    ============================================= */
 [data-theme="ios"] {
   --bg-primary: #F2F2F7;
@@ -231,14 +229,14 @@
   --footer-bg: #E5F9E7;
   --footer-text: inherit;
 
-  --sidebar-bg: #1C1C1E;
+  --sidebar-bg: #F9F9FB;
   --sidebar-text: #8E8E93;
   --sidebar-active-bg: #007AFF;
   --sidebar-active-text: #FFFFFF;
-  --sidebar-hover-bg: rgba(255, 255, 255, 0.05);
+  --sidebar-hover-bg: rgba(0, 0, 0, 0.05);
   --sidebar-section-text: #48484A;
-  --sidebar-border: #2C2C2E;
-  --sidebar-logo-text: #FFFFFF;
+  --sidebar-border: #C6C6C8;
+  --sidebar-logo-text: #000000;
 
   --sidebar-width: 240px;
   --header-height: 56px;
@@ -279,5 +277,14 @@
     --ok-text: #30D158;
     --footer-bg: #1A3A1A;
     --footer-text: #ffffff;
+
+    --sidebar-bg: #1C1C1E;
+    --sidebar-text: #98989D;
+    --sidebar-active-bg: #0A84FF;
+    --sidebar-active-text: #FFFFFF;
+    --sidebar-hover-bg: rgba(255, 255, 255, 0.08);
+    --sidebar-section-text: #545458;
+    --sidebar-border: #2C2C2E;
+    --sidebar-logo-text: #FFFFFF;
   }
 }

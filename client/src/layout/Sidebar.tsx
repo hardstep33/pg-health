@@ -1,18 +1,18 @@
 import React from 'react';
-import { MdStorage, MdSpeed, MdTune, MdLock, MdBarChart, MdRefresh } from 'react-icons/md';
+import { MdStorage, MdSpeed, MdTune, MdLock, MdBarChart, MdRefresh, MdSync } from 'react-icons/md';
 import ThemeSwitcher from '../components/ThemeSwitcher/ThemeSwitcher';
 import ConnectionSelector from '../widgets/connection/ConnectionSelector/ConnectionSelector';
 import ExportButton from '../components/ExportButton/ExportButton';
 import './layout.css';
 
-const StorageIcon = MdStorage  as React.FC;
-const SpeedIcon   = MdSpeed    as React.FC;
-const TuneIcon    = MdTune     as React.FC;
-const LockIcon    = MdLock     as React.FC;
+const StorageIcon = MdStorage as React.FC;
+const SpeedIcon   = MdSpeed   as React.FC;
+const TuneIcon    = MdTune    as React.FC;
+const LockIcon    = MdLock    as React.FC;
 const ChartIcon   = MdBarChart as React.FC;
-const RefreshIcon = MdRefresh  as React.FC;
+const SyncIcon    = MdSync    as React.FC;
 
-export type PageName = 'db-state' | 'postgres-params' | 'locks-transactions' | 'indexes';
+export type PageName = 'db-state' | 'postgres-params' | 'locks-transactions' | 'indexes' | 'replication';
 
 interface NavItem {
     id: PageName;
@@ -25,6 +25,7 @@ const navItems: NavItem[] = [
     { id: 'postgres-params',     label: 'Параметры PG',  Icon: TuneIcon  },
     { id: 'locks-transactions',  label: 'Блокировки',    Icon: LockIcon  },
     { id: 'indexes',             label: 'Индексы',       Icon: ChartIcon },
+    { id: 'replication',         label: 'Репликация',    Icon: SyncIcon  },
 ];
 
 interface SidebarProps {

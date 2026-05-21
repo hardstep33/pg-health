@@ -19,15 +19,17 @@ const LocksTransactionsPage: React.FC = () => {
             onReload: activeLocks.reload,
             isLoading: activeLocks.isLoading,
             fullWidth: true,
+            order: 1,
         },
         {
             id: 'long-running-queries',
             title: 'Длительные запросы (>30 сек)',
-            tooltip: 'Активные запросы, выполняющиеся дольше 30 секунд. Красным — более 5 минут.',
+            tooltip: 'Активные запросы дольше 30 секунд. Красным — более 5 минут.',
             component: longRunningQueries.component,
             onReload: longRunningQueries.reload,
             isLoading: longRunningQueries.isLoading,
             fullWidth: true,
+            order: 2,
         },
         {
             id: 'idle-in-transaction',
@@ -37,6 +39,7 @@ const LocksTransactionsPage: React.FC = () => {
             onReload: idleInTransaction.reload,
             isLoading: idleInTransaction.isLoading,
             fullWidth: true,
+            order: 3,
         },
     ];
 
