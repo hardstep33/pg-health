@@ -63,7 +63,7 @@ const ConnectionStats: React.FC<ConnectionStatsProps> = ({ data, error, errorToo
                     <td>{formatInteger(stats.idle_connections)}</td>
                     <td
                         className={idleInTransaction > 0 ? 'cell-warning' : ''}
-                        title={idleInTransaction > 0 ? 'Возможно, зависшие транзакции. Посмотри вкладку \'Блокировки и транзакции\'' : undefined}
+                        title={idleInTransaction > 0 ? 'Возможно, зависшие транзакции. Посмотри вкладку \'Блокировки\'' : undefined}
                         style={{ cursor: idleInTransaction > 0 ? 'help' : 'default' }}
                     >
                         {formatInteger(stats.idle_in_transaction)}
