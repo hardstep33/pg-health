@@ -22,7 +22,7 @@ const IndexesPage: React.FC = () => {
         {
             id: 'index-stats',
             title: 'Статистика использования индексов',
-            tooltip: 'Данные pg_stat_user_indexes + pg_statio_user_indexes. Неиспользуемые индексы отмечены красным.',
+            tooltip: 'Данные pg_stat_user_indexes + pg_statio_user_indexes. Неиспользуемые индексы отмечены красным. Индексы с "% кэша" > 90% прогреты и впустую занимают RAM сервера ',
             component: indexStats.component,
             onReload: indexStats.reload,
             isLoading: indexStats.isLoading,
