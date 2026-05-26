@@ -40,12 +40,14 @@ const ConnectionSelector: React.FC = () => {
                 setConnections(data);
                 if (data.length > 0 && !currentConnection) {
                     const storedId = getStoredConnectionId();
-                    const target = data.find(c => c.id === storedId) || data[0];
-                    setCurrentConnection({ id: target.id, description: target.description });
-                    // Если сохранённый id не совпадает с первым — переключить бэкенд
-                    if (target.id !== data[0].id || storedId) {
-                        switchConnection(target.id).catch(console.error);
+                    let target = data[0];
+                    if (storedId) {
+                        const found = data.find(c => c.id === storedId);
+                        if (found) target = found;
                     }
+                    setCurrentConnection({ id: target.id, description: target.description });
+                    // Синхронизируем бэкенд с выбранным сервером
+                    switchConnection(target.id).catch(console.error);
                 }
             })
             .catch(err => console.error('Ошибка загрузки подключений:', err));
@@ -57,11 +59,11 @@ const ConnectionSelector: React.FC = () => {
         setSwitching(true);
         try {
             const result = await switchConnection(id);
-            storeConnectionId(id); // ← сохраняем выбор
+            storeConnectionId(id);
             setCurrentConnection({ id: result.id, description: result.description });
             setTimeout(() => {
                 window.location.reload();
-            }, 1500);
+            }, 500);
         } catch (err) {
             console.error('Ошибка переключения:', err);
             setSwitching(false);
