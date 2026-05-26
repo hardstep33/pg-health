@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getConnections, switchConnection } from '../../../api/postgresApi';
-import { useConnectionContext } from '../../../hooks/useConnectionContext';
+import { useConnectionContext, ConnectionInfo } from '../../../hooks/useConnectionContext';
 
 interface ConnectionItem {
     id: string;
@@ -45,8 +45,14 @@ const ConnectionSelector: React.FC = () => {
                         const found = data.find(c => c.id === storedId);
                         if (found) target = found;
                     }
-                    setCurrentConnection({ id: target.id, description: target.description });
-                    // Синхронизируем бэкенд с выбранным сервером
+                    // Сохраняем полный объект в контекст
+                    setCurrentConnection({
+                        id: target.id,
+                        description: target.description || 'Без описания',
+                        host: target.host || 'неизвестный хост',
+                        port: target.port || 0,
+                        database: target.database || '',
+                    });
                     switchConnection(target.id).catch(console.error);
                 }
             })
@@ -59,11 +65,22 @@ const ConnectionSelector: React.FC = () => {
         setSwitching(true);
         try {
             const result = await switchConnection(id);
-            storeConnectionId(id);
-            setCurrentConnection({ id: result.id, description: result.description });
-            setTimeout(() => {
-                window.location.reload();
-            }, 500);
+            const selected = connections.find(c => c.id === id);
+            if (selected) {
+                setCurrentConnection({
+                    id: selected.id,
+                    description: selected.description || 'Без описания',
+                    host: selected.host || 'неизвестный хост',
+                    port: selected.port || 0,
+                    database: selected.database || '',
+                });
+                storeConnectionId(id);
+                setTimeout(() => {
+                    window.location.reload();
+                }, 500);
+            } else {
+                throw new Error('Не найдены данные подключения');
+            }
         } catch (err) {
             console.error('Ошибка переключения:', err);
             setSwitching(false);

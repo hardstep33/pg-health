@@ -3,6 +3,9 @@ import { createContext, useContext } from 'react';
 export interface ConnectionInfo {
     id: string;
     description: string;
+    host: string;
+    port: number;
+    database: string;
 }
 
 interface ConnectionContextType {

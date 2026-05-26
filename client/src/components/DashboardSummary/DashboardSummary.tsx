@@ -23,7 +23,7 @@ const DashboardSummary: React.FC<DashboardSummaryProps> = ({ onNavigate }) => {
     const fetchSummary = async () => {
       try {
         const data = await getDashboardSummary();
-        console.log('Dashboard summary data:', data);
+        //console.log('Dashboard summary data:', data);
         setSummary(data);
       } catch (err) {
         console.error(err);
