@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 import { SqlQuery } from './queries';
-import * as os from 'os';
-import { promises as fs } from 'fs';
 import { convertParamValue } from './param-utils';
 
 @Injectable()

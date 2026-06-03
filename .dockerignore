@@ -1,0 +1,7 @@
+node_modules
+dist
+.git
+*.md
+coverage
+client/node_modules
+client/build
