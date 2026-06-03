@@ -1,3 +1,4 @@
+/* Расположение виджетов по умолчанию на первом старте */
 import { useEffect } from 'react';
 
 const DEFAULT_SETTINGS: Record<string, string> = {

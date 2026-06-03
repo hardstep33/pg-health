@@ -1,3 +1,5 @@
+/* Основной модуль карточки (виджета) */
+
 import React, { useRef, useLayoutEffect, useEffect, useCallback, useState } from 'react';
 import { MdDragIndicator, MdRefresh, MdKeyboardArrowUp, MdKeyboardArrowDown } from 'react-icons/md';
 import './card.css';

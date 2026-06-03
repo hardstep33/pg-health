@@ -1,3 +1,4 @@
+/* Реализация drag-n-drop для виджетов */
 import React, { useState, useCallback } from 'react';
 import Card from '../Card/Card';
 import { useDashboardLayout, WidgetInfo } from '../../hooks/useDashboardLayout';

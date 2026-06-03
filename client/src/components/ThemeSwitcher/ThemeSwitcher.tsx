@@ -1,3 +1,4 @@
+/* Переключатель тем */
 import React, { useEffect, useState } from 'react';
 import './theme-switcher.css';
 

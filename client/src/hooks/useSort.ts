@@ -1,3 +1,4 @@
+/* Реализация сортировки по столбцам таблиц */
 import { useState, useMemo } from 'react';
 
 export interface SortConfig {
