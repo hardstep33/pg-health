@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { addConnection, testConnection as testConnectionApi } from '../../../api/postgresApi';
+import { addConnection, testConnection as testConnectionApi, getConnections } from '../../../api/postgresApi';
 
 interface ConnectionFormData {
     description: string;
@@ -40,6 +40,10 @@ const ConnectionManager: React.FC<ConnectionManagerProps> = ({ onConnectionAdded
     };
 
     const handleTestConnection = async () => {
+        if (!formData.host || !formData.port || !formData.database || !formData.user || !formData.password) {
+            setTestResult({ success: false, message: 'Заполните все поля для проверки соединения' });
+            return;
+        }
         setTesting(true);
         setTestResult(null);
         setError(null);
@@ -59,6 +63,8 @@ const ConnectionManager: React.FC<ConnectionManagerProps> = ({ onConnectionAdded
         setError(null);
         try {
             await addConnection(formData);
+            // Обновляем список коннектов
+            await getConnections();
             onConnectionAdded?.();
             onClose();
         } catch (err) {
@@ -70,7 +76,7 @@ const ConnectionManager: React.FC<ConnectionManagerProps> = ({ onConnectionAdded
 
     return (
         <div className="modal-overlay" onClick={onClose}>
-            <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '500px', padding: '24px' }}>
+            <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '600px', padding: '24px' }}>
                 <h2 style={{ marginBottom: '20px', fontSize: '1.5rem' }}>Добавить подключение к БД</h2>
                 
                 <form onSubmit={handleSubmit}>
@@ -82,7 +88,6 @@ const ConnectionManager: React.FC<ConnectionManagerProps> = ({ onConnectionAdded
                             value={formData.description}
                             onChange={handleChange}
                             required
-                            style={{ width: '100%', padding: '8px 12px', borderRadius: '4px', border: '1px solid #ccc' }}
                             placeholder="Например: Production DB"
                         />
                     </div>
@@ -96,7 +101,6 @@ const ConnectionManager: React.FC<ConnectionManagerProps> = ({ onConnectionAdded
                                 value={formData.host}
                                 onChange={handleChange}
                                 required
-                                style={{ width: '100%', padding: '8px 12px', borderRadius: '4px', border: '1px solid #ccc' }}
                                 placeholder="localhost"
                             />
                         </div>
@@ -108,7 +112,6 @@ const ConnectionManager: React.FC<ConnectionManagerProps> = ({ onConnectionAdded
                                 value={formData.port}
                                 onChange={handleChange}
                                 required
-                                style={{ width: '100%', padding: '8px 12px', borderRadius: '4px', border: '1px solid #ccc' }}
                             />
                         </div>
                     </div>
@@ -121,7 +124,6 @@ const ConnectionManager: React.FC<ConnectionManagerProps> = ({ onConnectionAdded
                             value={formData.database}
                             onChange={handleChange}
                             required
-                            style={{ width: '100%', padding: '8px 12px', borderRadius: '4px', border: '1px solid #ccc' }}
                             placeholder="postgres"
                         />
                     </div>
@@ -134,7 +136,6 @@ const ConnectionManager: React.FC<ConnectionManagerProps> = ({ onConnectionAdded
                             value={formData.user}
                             onChange={handleChange}
                             required
-                            style={{ width: '100%', padding: '8px 12px', borderRadius: '4px', border: '1px solid #ccc' }}
                             placeholder="postgres"
                         />
                     </div>
@@ -147,7 +148,6 @@ const ConnectionManager: React.FC<ConnectionManagerProps> = ({ onConnectionAdded
                             value={formData.password}
                             onChange={handleChange}
                             required
-                            style={{ width: '100%', padding: '8px 12px', borderRadius: '4px', border: '1px solid #ccc' }}
                             placeholder="••••••••"
                         />
                     </div>

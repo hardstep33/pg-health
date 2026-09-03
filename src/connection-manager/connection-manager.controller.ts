@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { ConnectionManagerService } from './connection-manager.service';
 
 export interface CreateConnectionDto {
@@ -30,7 +30,7 @@ export class ConnectionManagerController {
   }
 
   @Post('update/:id')
-  async update(@Body() dto: Partial<CreateConnectionDto>, @Body('id') id: string) {
+  async update(@Param('id') id: string, @Body() dto: Partial<CreateConnectionDto>) {
     return this.connectionManager.updateConnection(id, dto);
   }
 

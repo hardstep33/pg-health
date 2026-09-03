@@ -26,6 +26,7 @@ export declare class DatabaseService implements OnModuleInit, OnModuleDestroy {
     private readonly envPath;
     private configs;
     constructor(configService: ConfigService);
+    private reloadEnvFile;
     onModuleInit(): Promise<void>;
     onModuleDestroy(): Promise<void>;
     private getAllConfigs;

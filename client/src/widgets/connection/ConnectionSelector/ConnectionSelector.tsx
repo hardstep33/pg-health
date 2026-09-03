@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getConnections, switchConnection } from '../../../api/postgresApi';
-import { useConnectionContext, ConnectionInfo } from '../../../hooks/useConnectionContext';
+import { useConnectionContext } from '../../../hooks/useConnectionContext';
 import ConnectionManager from '../ConnectionManager/ConnectionManager';
 
 interface ConnectionItem {
@@ -63,14 +63,14 @@ const ConnectionSelector: React.FC = () => {
 
     useEffect(() => {
         loadConnections();
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
         const id = e.target.value;
         setLoading(true);
         setSwitching(true);
         try {
-            const result = await switchConnection(id);
+            await switchConnection(id);
             const selected = connections.find(c => c.id === id);
             if (selected) {
                 setCurrentConnection({
