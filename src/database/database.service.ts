@@ -40,7 +40,13 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
   private reloadEnvFile() {
     if (fs.existsSync(this.envPath)) {
       const envConfig = dotenv.parse(fs.readFileSync(this.envPath));
-      // Обновляем process.env новыми значениями
+      // Сначала удаляем все переменные POSTGRES* из process.env
+      Object.keys(process.env).forEach(key => {
+        if (key.startsWith('POSTGRES')) {
+          delete process.env[key];
+        }
+      });
+      // Затем устанавливаем новые значения из файла
       for (const key in envConfig) {
         process.env[key] = envConfig[key];
       }
