@@ -35,4 +35,8 @@ export class ConnectionManagerService {
   testConnection(dto: CreateConnectionDto) {
     return this.dbService.testConnection(dto.host, dto.port, dto.database, dto.user, dto.password);
   }
+
+  deleteConnection(id: string) {
+    return this.dbService.deleteConnection(id);
+  }
 }

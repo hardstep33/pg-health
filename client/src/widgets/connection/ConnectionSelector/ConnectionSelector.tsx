@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getConnections, switchConnection } from '../../../api/postgresApi';
+import { getConnections, switchConnection, deleteConnection as deleteConnectionApi } from '../../../api/postgresApi';
 import { useConnectionContext } from '../../../hooks/useConnectionContext';
 import ConnectionManager from '../ConnectionManager/ConnectionManager';
 
@@ -35,6 +35,7 @@ const ConnectionSelector: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [switching, setSwitching] = useState(false);
     const [showManager, setShowManager] = useState(false);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
 
     const loadConnections = () => {
         getConnections()
@@ -98,6 +99,23 @@ const ConnectionSelector: React.FC = () => {
         loadConnections();
     };
 
+    const handleDeleteConnection = async (id: string, event: React.MouseEvent) => {
+        event.stopPropagation();
+        // eslint-disable-next-line no-restricted-globals
+        if (!confirm('Вы уверены, что хотите удалить это подключение?')) return;
+        
+        setDeletingId(id);
+        try {
+            await deleteConnectionApi(id);
+            loadConnections();
+        } catch (err) {
+            console.error('Ошибка удаления подключения:', err);
+            alert('Ошибка удаления подключения');
+        } finally {
+            setDeletingId(null);
+        }
+    };
+
     if (connections.length === 0) {
         return (
             <div className="connection-selector">
@@ -149,8 +167,25 @@ const ConnectionSelector: React.FC = () => {
                         color: 'white',
                         cursor: 'pointer',
                     }}
+                    title="Добавить подключение"
                 >
                     +
+                </button>
+                <button
+                    onClick={(e) => handleDeleteConnection(currentConnection?.id || connections[0]?.id, e)}
+                    disabled={deletingId !== null || connections.length === 0}
+                    style={{
+                        marginLeft: '4px',
+                        padding: '4px 12px',
+                        borderRadius: '4px',
+                        border: 'none',
+                        backgroundColor: deletingId !== null ? '#ccc' : '#dc3545',
+                        color: 'white',
+                        cursor: deletingId !== null ? 'not-allowed' : 'pointer',
+                    }}
+                    title="Удалить текущее подключение"
+                >
+                    {deletingId !== null ? '⏳' : '−'}
                 </button>
             </div>
             {showManager && (

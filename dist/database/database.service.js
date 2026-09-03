@@ -236,6 +236,32 @@ let DatabaseService = DatabaseService_1 = class DatabaseService {
             return { success: false, message: err.message };
         }
     }
+    async deleteConnection(id) {
+        const existingIndex = this.configs.findIndex(c => c.id === id);
+        if (existingIndex === -1)
+            throw new Error(`Connection ${id} not found`);
+        const existing = this.configs[existingIndex];
+        const prefix = `POSTGRES${id}`;
+        const envVars = this.readEnvFile();
+        delete envVars[`${prefix}_DESCRIPTION`];
+        delete envVars[`${prefix}_HOST`];
+        delete envVars[`${prefix}_PORT`];
+        delete envVars[`${prefix}_DATABASE`];
+        delete envVars[`${prefix}_USER`];
+        delete envVars[`${prefix}_PASSWORD`];
+        this.writeEnvFile(envVars);
+        this.reloadEnvFile();
+        const oldPool = this.pools.get(id);
+        if (oldPool) {
+            await oldPool.end();
+            this.pools.delete(id);
+        }
+        this.configs = this.getAllConfigs();
+        if (this.currentId === id) {
+            this.currentId = this.configs.length > 0 ? this.configs[0].id : null;
+        }
+        this.logger.log(`Connection deleted: ${existing.description} (${id})`);
+    }
     getCurrentPool() {
         if (!this.currentId)
             throw new Error('No active connection');

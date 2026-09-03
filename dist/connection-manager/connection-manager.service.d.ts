@@ -23,4 +23,5 @@ export declare class ConnectionManagerService {
         success: boolean;
         message: string;
     }>;
+    deleteConnection(id: string): Promise<void>;
 }

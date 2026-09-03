@@ -27,4 +27,5 @@ export declare class ConnectionManagerController {
         success: boolean;
         message: string;
     }>;
+    delete(id: string): Promise<void>;
 }

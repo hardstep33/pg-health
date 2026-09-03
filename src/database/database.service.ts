@@ -268,6 +268,44 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
+  async deleteConnection(id: string): Promise<void> {
+    const existingIndex = this.configs.findIndex(c => c.id === id);
+    if (existingIndex === -1) throw new Error(`Connection ${id} not found`);
+    const existing = this.configs[existingIndex];
+
+    const prefix = `POSTGRES${id}`;
+    
+    // Чтение и обновление .env файла - удаляем все переменные для этого подключения
+    const envVars = this.readEnvFile();
+    delete envVars[`${prefix}_DESCRIPTION`];
+    delete envVars[`${prefix}_HOST`];
+    delete envVars[`${prefix}_PORT`];
+    delete envVars[`${prefix}_DATABASE`];
+    delete envVars[`${prefix}_USER`];
+    delete envVars[`${prefix}_PASSWORD`];
+    this.writeEnvFile(envVars);
+
+    // Перечитываем .env файл и обновляем переменные окружения
+    this.reloadEnvFile();
+
+    // Закрываем пул
+    const oldPool = this.pools.get(id);
+    if (oldPool) {
+      await oldPool.end();
+      this.pools.delete(id);
+    }
+
+    // Обновляем configs
+    this.configs = this.getAllConfigs();
+    
+    // Если удалили текущее подключение, переключаемся на первое доступное
+    if (this.currentId === id) {
+      this.currentId = this.configs.length > 0 ? this.configs[0].id : null;
+    }
+
+    this.logger.log(`Connection deleted: ${existing.description} (${id})`);
+  }
+
   getCurrentPool(): Pool {
     if (!this.currentId) throw new Error('No active connection');
     const pool = this.pools.get(this.currentId);

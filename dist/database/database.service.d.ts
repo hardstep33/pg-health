@@ -40,6 +40,7 @@ export declare class DatabaseService implements OnModuleInit, OnModuleDestroy {
         success: boolean;
         message: string;
     }>;
+    deleteConnection(id: string): Promise<void>;
     getCurrentPool(): Pool;
     getPoolById(id: string): Pool | undefined;
     getConnectionList(): {

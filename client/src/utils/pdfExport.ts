@@ -111,11 +111,9 @@ export async function exportToPdf(container: HTMLElement, filename: string = 're
         //    будем нарезать его на полосы и добавлять новые страницы
         if (scaledHeight <= pageHeight) {
             // Всё помещается на одной странице
-            const imgData = canvas.toDataURL('image/jpeg', 0.85); // JPEG со сжатием
-            pdf.addImage(imgData, 'JPEG', 0, 0, pageWidth, scaledHeight);
+            pdf.addImage(canvas.toDataURL('image/jpeg', 0.85), 'JPEG', 0, 0, pageWidth, scaledHeight);
         } else {
             // Нужно несколько страниц: разрезаем исходное изображение по высоте
-            const imgData = canvas.toDataURL('image/jpeg', 0.85);
             let remainingHeight = imgHeight;
             let srcY = 0;
 

@@ -39,6 +39,9 @@ let ConnectionManagerService = class ConnectionManagerService {
     testConnection(dto) {
         return this.dbService.testConnection(dto.host, dto.port, dto.database, dto.user, dto.password);
     }
+    deleteConnection(id) {
+        return this.dbService.deleteConnection(id);
+    }
 };
 exports.ConnectionManagerService = ConnectionManagerService;
 exports.ConnectionManagerService = ConnectionManagerService = __decorate([

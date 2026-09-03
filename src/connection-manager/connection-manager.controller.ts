@@ -38,4 +38,9 @@ export class ConnectionManagerController {
   async test(@Body() dto: CreateConnectionDto) {
     return this.connectionManager.testConnection(dto);
   }
+
+  @Post('delete/:id')
+  async delete(@Param('id') id: string) {
+    return this.connectionManager.deleteConnection(id);
+  }
 }
