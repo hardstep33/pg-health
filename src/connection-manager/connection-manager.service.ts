@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { DatabaseService } from '../database/database.service';
+import { DatabaseService, CreateConnectionDto } from '../database/database.service';
 
 @Injectable()
 export class ConnectionManagerService {
@@ -22,5 +22,17 @@ export class ConnectionManagerService {
 
   getCurrentId() {
     return this.dbService.getCurrentId();
+  }
+
+  addConnection(dto: CreateConnectionDto) {
+    return this.dbService.addConnection(dto);
+  }
+
+  updateConnection(id: string, dto: Partial<CreateConnectionDto>) {
+    return this.dbService.updateConnection(id, dto);
+  }
+
+  testConnection(dto: CreateConnectionDto) {
+    return this.dbService.testConnection(dto.host, dto.port, dto.database, dto.user, dto.password);
   }
 }
