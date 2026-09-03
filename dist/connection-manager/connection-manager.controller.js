@@ -28,11 +28,14 @@ let ConnectionManagerController = class ConnectionManagerController {
     async add(dto) {
         return this.connectionManager.addConnection(dto);
     }
-    async update(dto, id) {
+    async update(id, dto) {
         return this.connectionManager.updateConnection(id, dto);
     }
     async test(dto) {
         return this.connectionManager.testConnection(dto);
+    }
+    async delete(id) {
+        return this.connectionManager.deleteConnection(id);
     }
 };
 exports.ConnectionManagerController = ConnectionManagerController;
@@ -58,10 +61,10 @@ __decorate([
 ], ConnectionManagerController.prototype, "add", null);
 __decorate([
     (0, common_1.Post)('update/:id'),
-    __param(0, (0, common_1.Body)()),
-    __param(1, (0, common_1.Body)('id')),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], ConnectionManagerController.prototype, "update", null);
 __decorate([
@@ -71,6 +74,13 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], ConnectionManagerController.prototype, "test", null);
+__decorate([
+    (0, common_1.Post)('delete/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], ConnectionManagerController.prototype, "delete", null);
 exports.ConnectionManagerController = ConnectionManagerController = __decorate([
     (0, common_1.Controller)('api/connections'),
     __metadata("design:paramtypes", [connection_manager_service_1.ConnectionManagerService])

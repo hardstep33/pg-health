@@ -16,6 +16,7 @@ const config_1 = require("@nestjs/config");
 const pg_1 = require("pg");
 const fs = require("fs");
 const path = require("path");
+const dotenv = require("dotenv");
 let DatabaseService = DatabaseService_1 = class DatabaseService {
     constructor(configService) {
         this.configService = configService;
@@ -24,6 +25,15 @@ let DatabaseService = DatabaseService_1 = class DatabaseService {
         this.logger = new common_1.Logger(DatabaseService_1.name);
         this.envPath = path.join(process.cwd(), '.env');
         this.configs = [];
+    }
+    reloadEnvFile() {
+        if (fs.existsSync(this.envPath)) {
+            const envConfig = dotenv.parse(fs.readFileSync(this.envPath));
+            for (const key in envConfig) {
+                process.env[key] = envConfig[key];
+            }
+            this.logger.log(`Reloaded .env file with ${Object.keys(envConfig).length} variables`);
+        }
     }
     async onModuleInit() {
         await this.reloadPools();
@@ -121,6 +131,7 @@ let DatabaseService = DatabaseService_1 = class DatabaseService {
         envVars[`${prefix}_USER`] = dto.user;
         envVars[`${prefix}_PASSWORD`] = dto.password;
         this.writeEnvFile(envVars);
+        this.reloadEnvFile();
         const pool = new pg_1.Pool({
             host: dto.host,
             port: dto.port,
@@ -135,19 +146,11 @@ let DatabaseService = DatabaseService_1 = class DatabaseService {
             const client = await pool.connect();
             client.release();
             this.pools.set(id, pool);
-            this.configs.push({
-                id,
-                description: dto.description,
-                host: dto.host,
-                port: dto.port,
-                database: dto.database,
-                user: dto.user,
-                password: dto.password,
-            });
+            this.configs = this.getAllConfigs();
             if (!this.currentId)
                 this.currentId = id;
             this.logger.log(`Connection added: ${dto.description} (${id})`);
-            return this.configs[this.configs.length - 1];
+            return this.configs.find(c => c.id === id);
         }
         catch (err) {
             await pool.end();
@@ -175,6 +178,7 @@ let DatabaseService = DatabaseService_1 = class DatabaseService {
         if (dto.password !== undefined)
             envVars[`${prefix}_PASSWORD`] = dto.password;
         this.writeEnvFile(envVars);
+        this.reloadEnvFile();
         const oldPool = this.pools.get(id);
         if (oldPool) {
             await oldPool.end();
@@ -203,7 +207,7 @@ let DatabaseService = DatabaseService_1 = class DatabaseService {
             const client = await pool.connect();
             client.release();
             this.pools.set(id, pool);
-            this.configs[existingIndex] = updatedConfig;
+            this.configs = this.getAllConfigs();
             this.logger.log(`Connection updated: ${updatedConfig.description} (${id})`);
             return updatedConfig;
         }
@@ -231,6 +235,32 @@ let DatabaseService = DatabaseService_1 = class DatabaseService {
             await pool.end();
             return { success: false, message: err.message };
         }
+    }
+    async deleteConnection(id) {
+        const existingIndex = this.configs.findIndex(c => c.id === id);
+        if (existingIndex === -1)
+            throw new Error(`Connection ${id} not found`);
+        const existing = this.configs[existingIndex];
+        const prefix = `POSTGRES${id}`;
+        const envVars = this.readEnvFile();
+        delete envVars[`${prefix}_DESCRIPTION`];
+        delete envVars[`${prefix}_HOST`];
+        delete envVars[`${prefix}_PORT`];
+        delete envVars[`${prefix}_DATABASE`];
+        delete envVars[`${prefix}_USER`];
+        delete envVars[`${prefix}_PASSWORD`];
+        this.writeEnvFile(envVars);
+        this.reloadEnvFile();
+        const oldPool = this.pools.get(id);
+        if (oldPool) {
+            await oldPool.end();
+            this.pools.delete(id);
+        }
+        this.configs = this.getAllConfigs();
+        if (this.currentId === id) {
+            this.currentId = this.configs.length > 0 ? this.configs[0].id : null;
+        }
+        this.logger.log(`Connection deleted: ${existing.description} (${id})`);
     }
     getCurrentPool() {
         if (!this.currentId)

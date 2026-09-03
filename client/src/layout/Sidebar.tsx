@@ -1,5 +1,5 @@
 import React from 'react';
-import { MdStorage, MdSpeed, MdTune, MdLock, MdBarChart, MdRefresh, MdSync } from 'react-icons/md';
+import { MdStorage, MdSpeed, MdTune, MdLock, MdBarChart, MdSync } from 'react-icons/md';
 import ThemeSwitcher from '../components/ThemeSwitcher/ThemeSwitcher';
 import ConnectionSelector from '../widgets/connection/ConnectionSelector/ConnectionSelector';
 import ExportButton from '../components/ExportButton/ExportButton';

@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { Pool } from 'pg';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as dotenv from 'dotenv';
 
 export interface DbConfig {
   id: string;
@@ -32,6 +33,22 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
   private configs: DbConfig[] = [];
 
   constructor(private configService: ConfigService) {}
+
+  /**
+   * Перечитывает .env файл и обновляет переменные окружения в процессе
+   */
+  private reloadEnvFile() {
+    if (fs.existsSync(this.envPath)) {
+      const envConfig = dotenv.parse(fs.readFileSync(this.envPath));
+      // Обновляем process.env новыми значениями
+      for (const key in envConfig) {
+        process.env[key] = envConfig[key];
+      }
+      // Также обновляем внутренний кэш ConfigService
+      // Это необходимо для работы в Docker, где переменные окружения не перезагружаются автоматически
+      this.logger.log(`Reloaded .env file with ${Object.keys(envConfig).length} variables`);
+    }
+  }
 
   async onModuleInit() {
     await this.reloadPools();
@@ -135,6 +152,9 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     envVars[`${prefix}_PASSWORD`] = dto.password;
     this.writeEnvFile(envVars);
 
+    // Перечитываем .env файл и обновляем переменные окружения
+    this.reloadEnvFile();
+
     // Создаем пул для нового подключения
     const pool = new Pool({
       host: dto.host,
@@ -151,19 +171,12 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
       const client = await pool.connect();
       client.release();
       this.pools.set(id, pool);
-      this.configs.push({
-        id,
-        description: dto.description,
-        host: dto.host,
-        port: dto.port,
-        database: dto.database,
-        user: dto.user,
-        password: dto.password,
-      });
+      // Обновляем configs из getAllConfigs(), чтобы получить актуальные данные
+      this.configs = this.getAllConfigs();
       if (!this.currentId) this.currentId = id;
 
       this.logger.log(`Connection added: ${dto.description} (${id})`);
-      return this.configs[this.configs.length - 1];
+      return this.configs.find(c => c.id === id)!;
     } catch (err) {
       await pool.end();
       this.pools.delete(id);
@@ -187,6 +200,9 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     if (dto.user !== undefined) envVars[`${prefix}_USER`] = dto.user;
     if (dto.password !== undefined) envVars[`${prefix}_PASSWORD`] = dto.password;
     this.writeEnvFile(envVars);
+
+    // Перечитываем .env файл и обновляем переменные окружения
+    this.reloadEnvFile();
 
     // Закрываем старый пул и создаем новый
     const oldPool = this.pools.get(id);
@@ -220,7 +236,8 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
       const client = await pool.connect();
       client.release();
       this.pools.set(id, pool);
-      this.configs[existingIndex] = updatedConfig;
+      // Обновляем configs из getAllConfigs(), чтобы получить актуальные данные
+      this.configs = this.getAllConfigs();
 
       this.logger.log(`Connection updated: ${updatedConfig.description} (${id})`);
       return updatedConfig;
@@ -249,6 +266,44 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
       await pool.end();
       return { success: false, message: err.message };
     }
+  }
+
+  async deleteConnection(id: string): Promise<void> {
+    const existingIndex = this.configs.findIndex(c => c.id === id);
+    if (existingIndex === -1) throw new Error(`Connection ${id} not found`);
+    const existing = this.configs[existingIndex];
+
+    const prefix = `POSTGRES${id}`;
+    
+    // Чтение и обновление .env файла - удаляем все переменные для этого подключения
+    const envVars = this.readEnvFile();
+    delete envVars[`${prefix}_DESCRIPTION`];
+    delete envVars[`${prefix}_HOST`];
+    delete envVars[`${prefix}_PORT`];
+    delete envVars[`${prefix}_DATABASE`];
+    delete envVars[`${prefix}_USER`];
+    delete envVars[`${prefix}_PASSWORD`];
+    this.writeEnvFile(envVars);
+
+    // Перечитываем .env файл и обновляем переменные окружения
+    this.reloadEnvFile();
+
+    // Закрываем пул
+    const oldPool = this.pools.get(id);
+    if (oldPool) {
+      await oldPool.end();
+      this.pools.delete(id);
+    }
+
+    // Обновляем configs
+    this.configs = this.getAllConfigs();
+    
+    // Если удалили текущее подключение, переключаемся на первое доступное
+    if (this.currentId === id) {
+      this.currentId = this.configs.length > 0 ? this.configs[0].id : null;
+    }
+
+    this.logger.log(`Connection deleted: ${existing.description} (${id})`);
   }
 
   getCurrentPool(): Pool {

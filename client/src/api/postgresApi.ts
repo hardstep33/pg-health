@@ -57,6 +57,10 @@ export const testConnection = (data: { description: string; host: string; port: 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
     });
+export const deleteConnection = (id: string) =>
+    fetchJson(`/api/connections/delete/${id}`, {
+        method: 'POST',
+    });
 export const getQPS = () => fetchJson('/db/qps');
 export const getReplicationStats = () => fetchJson('/replication/stats');
 export const getReplicationSlots = () => fetchJson('/replication/slots');

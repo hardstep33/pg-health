@@ -26,6 +26,7 @@ export declare class DatabaseService implements OnModuleInit, OnModuleDestroy {
     private readonly envPath;
     private configs;
     constructor(configService: ConfigService);
+    private reloadEnvFile;
     onModuleInit(): Promise<void>;
     onModuleDestroy(): Promise<void>;
     private getAllConfigs;
@@ -39,6 +40,7 @@ export declare class DatabaseService implements OnModuleInit, OnModuleDestroy {
         success: boolean;
         message: string;
     }>;
+    deleteConnection(id: string): Promise<void>;
     getCurrentPool(): Pool;
     getPoolById(id: string): Pool | undefined;
     getConnectionList(): {
