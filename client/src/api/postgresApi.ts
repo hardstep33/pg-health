@@ -45,6 +45,18 @@ export const getIndexStats = () => fetchJson('/db/index-stats');
 export const getConnectionStats = () => fetchJson('/db/connection-stats');
 export const getConnections = () => fetchJson('/api/connections');
 export const switchConnection = (id: string) => fetchJson('/api/connections/switch', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
+export const addConnection = (data: { description: string; host: string; port: number; database: string; user: string; password: string }) =>
+    fetchJson('/api/connections/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+    });
+export const testConnection = (data: { description: string; host: string; port: number; database: string; user: string; password: string }) =>
+    fetchJson('/api/connections/test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+    });
 export const getQPS = () => fetchJson('/db/qps');
 export const getReplicationStats = () => fetchJson('/replication/stats');
 export const getReplicationSlots = () => fetchJson('/replication/slots');

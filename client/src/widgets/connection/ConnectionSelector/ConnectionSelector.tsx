@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getConnections, switchConnection } from '../../../api/postgresApi';
 import { useConnectionContext, ConnectionInfo } from '../../../hooks/useConnectionContext';
+import ConnectionManager from '../ConnectionManager/ConnectionManager';
 
 interface ConnectionItem {
     id: string;
@@ -33,8 +34,9 @@ const ConnectionSelector: React.FC = () => {
     const [connections, setConnections] = useState<ConnectionItem[]>([]);
     const [loading, setLoading] = useState(false);
     const [switching, setSwitching] = useState(false);
+    const [showManager, setShowManager] = useState(false);
 
-    useEffect(() => {
+    const loadConnections = () => {
         getConnections()
             .then((data: ConnectionItem[]) => {
                 setConnections(data);
@@ -57,6 +59,10 @@ const ConnectionSelector: React.FC = () => {
                 }
             })
             .catch(err => console.error('Ошибка загрузки подключений:', err));
+    };
+
+    useEffect(() => {
+        loadConnections();
     }, []);
 
     const handleChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -88,32 +94,72 @@ const ConnectionSelector: React.FC = () => {
         }
     };
 
+    const handleConnectionAdded = () => {
+        loadConnections();
+    };
+
     if (connections.length === 0) {
         return (
             <div className="connection-selector">
                 <span className="connection-label">Подключение:</span>
                 <span style={{ color: 'var(--error-red)', fontWeight: 500 }}>Нет доступных БД</span>
+                <button
+                    onClick={() => setShowManager(true)}
+                    style={{
+                        marginLeft: '8px',
+                        padding: '4px 12px',
+                        borderRadius: '4px',
+                        border: 'none',
+                        backgroundColor: '#007bff',
+                        color: 'white',
+                        cursor: 'pointer',
+                    }}
+                >
+                    Добавить
+                </button>
             </div>
         );
     }
 
     return (
-        <div className="connection-selector">
-            <span className="connection-label">Подключение:</span>
-            <select
-                className="connection-select"
-                value={currentConnection?.id || connections[0]?.id || ''}
-                onChange={handleChange}
-                disabled={loading}
-            >
-                {connections.map(c => (
-                    <option key={c.id} value={c.id}>
-                        {c.description} ({c.host}:{c.port})
-                    </option>
-                ))}
-            </select>
-            {switching && <span className="connection-loading">⏳...</span>}
-        </div>
+        <>
+            <div className="connection-selector">
+                <span className="connection-label">Подключение:</span>
+                <select
+                    className="connection-select"
+                    value={currentConnection?.id || connections[0]?.id || ''}
+                    onChange={handleChange}
+                    disabled={loading}
+                >
+                    {connections.map(c => (
+                        <option key={c.id} value={c.id}>
+                            {c.description} ({c.host}:{c.port})
+                        </option>
+                    ))}
+                </select>
+                {switching && <span className="connection-loading">⏳...</span>}
+                <button
+                    onClick={() => setShowManager(true)}
+                    style={{
+                        marginLeft: '8px',
+                        padding: '4px 12px',
+                        borderRadius: '4px',
+                        border: 'none',
+                        backgroundColor: '#28a745',
+                        color: 'white',
+                        cursor: 'pointer',
+                    }}
+                >
+                    +
+                </button>
+            </div>
+            {showManager && (
+                <ConnectionManager
+                    onConnectionAdded={handleConnectionAdded}
+                    onClose={() => setShowManager(false)}
+                />
+            )}
+        </>
     );
 };
 

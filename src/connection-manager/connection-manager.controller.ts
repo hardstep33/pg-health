@@ -1,6 +1,15 @@
 import { Controller, Get, Post, Body } from '@nestjs/common';
 import { ConnectionManagerService } from './connection-manager.service';
 
+export interface CreateConnectionDto {
+  description: string;
+  host: string;
+  port: number;
+  database: string;
+  user: string;
+  password: string;
+}
+
 @Controller('api/connections')
 export class ConnectionManagerController {
   constructor(private connectionManager: ConnectionManagerService) {}
@@ -13,5 +22,20 @@ export class ConnectionManagerController {
   @Post('switch')
   switch(@Body('id') id: string) {
     return this.connectionManager.switchTo(id);
+  }
+
+  @Post('add')
+  async add(@Body() dto: CreateConnectionDto) {
+    return this.connectionManager.addConnection(dto);
+  }
+
+  @Post('update/:id')
+  async update(@Body() dto: Partial<CreateConnectionDto>, @Body('id') id: string) {
+    return this.connectionManager.updateConnection(id, dto);
+  }
+
+  @Post('test')
+  async test(@Body() dto: CreateConnectionDto) {
+    return this.connectionManager.testConnection(dto);
   }
 }
