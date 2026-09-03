@@ -361,9 +361,71 @@
   cursor: not-allowed;
 }
 
+.connection-select option {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
 .connection-loading {
   font-size: 0.85rem;
   color: var(--text-secondary);
+}
+
+/* =============================================
+   Form inputs and placeholders
+   ============================================= */
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+input::-webkit-input-placeholder,
+textarea::-webkit-input-placeholder {
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+input::-moz-placeholder,
+textarea::-moz-placeholder {
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+input:-ms-input-placeholder,
+textarea:-ms-input-placeholder {
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+input::-ms-input-placeholder,
+textarea::-ms-input-placeholder {
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+.form-group input,
+.form-row input {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.form-group input:focus,
+.form-row input:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.15);
+}
+
+.form-group input:hover,
+.form-row input:hover {
+  border-color: var(--accent-blue);
 }
 
 /* =============================================
@@ -406,4 +468,100 @@
   font-weight: 400;
   color: var(--text-secondary);
   margin-left: 8px;
+}
+
+/* =============================================
+   Modal (Connection Manager)
+   ============================================= */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: var(--bg-tertiary);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-content h2 {
+  color: var(--text-primary);
+}
+
+.modal-content label {
+  color: var(--text-primary);
+}
+
+.modal-content input {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.modal-content input:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.15);
+}
+
+.modal-content input:hover {
+  border-color: var(--accent-blue);
+}
+
+.modal-content input::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+.modal-content input::-webkit-input-placeholder {
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+.modal-content input::-moz-placeholder {
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+.modal-content input:-ms-input-placeholder {
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+.modal-content select {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.modal-content select:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.15);
+}
+
+.modal-content select option {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
 }

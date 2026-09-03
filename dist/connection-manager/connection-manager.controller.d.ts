@@ -22,7 +22,7 @@ export declare class ConnectionManagerController {
         description: string;
     };
     add(dto: CreateConnectionDto): Promise<import("../database/database.service").DbConfig>;
-    update(dto: Partial<CreateConnectionDto>, id: string): Promise<import("../database/database.service").DbConfig>;
+    update(id: string, dto: Partial<CreateConnectionDto>): Promise<import("../database/database.service").DbConfig>;
     test(dto: CreateConnectionDto): Promise<{
         success: boolean;
         message: string;
