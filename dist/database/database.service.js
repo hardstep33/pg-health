@@ -29,6 +29,11 @@ let DatabaseService = DatabaseService_1 = class DatabaseService {
     reloadEnvFile() {
         if (fs.existsSync(this.envPath)) {
             const envConfig = dotenv.parse(fs.readFileSync(this.envPath));
+            Object.keys(process.env).forEach(key => {
+                if (key.startsWith('POSTGRES')) {
+                    delete process.env[key];
+                }
+            });
             for (const key in envConfig) {
                 process.env[key] = envConfig[key];
             }
