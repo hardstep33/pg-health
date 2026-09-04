@@ -31,6 +31,7 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(DatabaseService.name);
   private readonly envPath = path.join(process.cwd(), '.env');
   private configs: DbConfig[] = [];
+  private envCache: Record<string, string> = {};
 
   constructor(private configService: ConfigService) {}
 
@@ -40,9 +41,21 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
   private reloadEnvFile() {
     if (fs.existsSync(this.envPath)) {
       const envConfig = dotenv.parse(fs.readFileSync(this.envPath));
-      // Обновляем process.env новыми значениями
+      // Сначала удаляем все переменные POSTGRES* из process.env и кэша
+      Object.keys(process.env).forEach(key => {
+        if (key.startsWith('POSTGRES')) {
+          delete process.env[key];
+        }
+      });
+      Object.keys(this.envCache).forEach(key => {
+        if (key.startsWith('POSTGRES')) {
+          delete this.envCache[key];
+        }
+      });
+      // Затем устанавливаем новые значения из файла
       for (const key in envConfig) {
         process.env[key] = envConfig[key];
+        this.envCache[key] = envConfig[key];
       }
       // Также обновляем внутренний кэш ConfigService
       // Это необходимо для работы в Docker, где переменные окружения не перезагружаются автоматически
@@ -64,16 +77,16 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
   private getAllConfigs(): DbConfig[] {
     const configs: DbConfig[] = [];
     for (let i = 1; i <= 20; i++) {
-      const host = this.configService.get<string>(`POSTGRES${i}_HOST`);
+      const host = this.envCache[`POSTGRES${i}_HOST`] || process.env[`POSTGRES${i}_HOST`];
       if (!host) continue;
       configs.push({
         id: `${i}`,
-        description: this.configService.get<string>(`POSTGRES${i}_DESCRIPTION`) || `DB ${i}`,
+        description: this.envCache[`POSTGRES${i}_DESCRIPTION`] || process.env[`POSTGRES${i}_DESCRIPTION`] || `DB ${i}`,
         host,
-        port: Number(this.configService.get<string>(`POSTGRES${i}_PORT`)) || 5432,
-        database: this.configService.get<string>(`POSTGRES${i}_DATABASE`) || '',
-        user: this.configService.get<string>(`POSTGRES${i}_USER`) || '',
-        password: this.configService.get<string>(`POSTGRES${i}_PASSWORD`) || '',
+        port: Number(this.envCache[`POSTGRES${i}_PORT`] || process.env[`POSTGRES${i}_PORT`] || '5432'),
+        database: this.envCache[`POSTGRES${i}_DATABASE`] || process.env[`POSTGRES${i}_DATABASE`] || '',
+        user: this.envCache[`POSTGRES${i}_USER`] || process.env[`POSTGRES${i}_USER`] || '',
+        password: this.envCache[`POSTGRES${i}_PASSWORD`] || process.env[`POSTGRES${i}_PASSWORD`] || '',
       });
     }
     return configs;
