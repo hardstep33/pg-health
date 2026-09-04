@@ -25,6 +25,7 @@ let DatabaseService = DatabaseService_1 = class DatabaseService {
         this.logger = new common_1.Logger(DatabaseService_1.name);
         this.envPath = path.join(process.cwd(), '.env');
         this.configs = [];
+        this.envCache = {};
     }
     reloadEnvFile() {
         if (fs.existsSync(this.envPath)) {
@@ -34,8 +35,14 @@ let DatabaseService = DatabaseService_1 = class DatabaseService {
                     delete process.env[key];
                 }
             });
+            Object.keys(this.envCache).forEach(key => {
+                if (key.startsWith('POSTGRES')) {
+                    delete this.envCache[key];
+                }
+            });
             for (const key in envConfig) {
                 process.env[key] = envConfig[key];
+                this.envCache[key] = envConfig[key];
             }
             this.logger.log(`Reloaded .env file with ${Object.keys(envConfig).length} variables`);
         }
@@ -52,17 +59,17 @@ let DatabaseService = DatabaseService_1 = class DatabaseService {
     getAllConfigs() {
         const configs = [];
         for (let i = 1; i <= 20; i++) {
-            const host = this.configService.get(`POSTGRES${i}_HOST`);
+            const host = this.envCache[`POSTGRES${i}_HOST`] || process.env[`POSTGRES${i}_HOST`];
             if (!host)
                 continue;
             configs.push({
                 id: `${i}`,
-                description: this.configService.get(`POSTGRES${i}_DESCRIPTION`) || `DB ${i}`,
+                description: this.envCache[`POSTGRES${i}_DESCRIPTION`] || process.env[`POSTGRES${i}_DESCRIPTION`] || `DB ${i}`,
                 host,
-                port: Number(this.configService.get(`POSTGRES${i}_PORT`)) || 5432,
-                database: this.configService.get(`POSTGRES${i}_DATABASE`) || '',
-                user: this.configService.get(`POSTGRES${i}_USER`) || '',
-                password: this.configService.get(`POSTGRES${i}_PASSWORD`) || '',
+                port: Number(this.envCache[`POSTGRES${i}_PORT`] || process.env[`POSTGRES${i}_PORT`] || '5432'),
+                database: this.envCache[`POSTGRES${i}_DATABASE`] || process.env[`POSTGRES${i}_DATABASE`] || '',
+                user: this.envCache[`POSTGRES${i}_USER`] || process.env[`POSTGRES${i}_USER`] || '',
+                password: this.envCache[`POSTGRES${i}_PASSWORD`] || process.env[`POSTGRES${i}_PASSWORD`] || '',
             });
         }
         return configs;
