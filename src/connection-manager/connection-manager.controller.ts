@@ -19,8 +19,13 @@ export class ConnectionManagerController {
   }
 
   @Post('switch')
-  switch(@Body('id') id: string) {
-    return this.connectionManager.switchTo(id);
+  async switch(@Body('id') id: string) {
+    try {
+      return await this.connectionManager.switchTo(id);
+    } catch (err: any) {
+      // Возвращаем ошибку в теле ответа, чтобы фронтенд мог показать понятное сообщение
+      return { error: err?.message || 'Не удалось переключить подключение' };
+    }
   }
 
   @Post('add')
