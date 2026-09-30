@@ -292,7 +292,11 @@ let DatabaseService = DatabaseService_1 = class DatabaseService {
             host: c.host,
             port: c.port,
             database: c.database,
+            user: c.user,
         }));
+    }
+    getConnectionById(id) {
+        return this.getAllConfigs().find(c => c.id === id);
     }
     switchTo(id) {
         const cfg = this.getAllConfigs().find(c => c.id === id);

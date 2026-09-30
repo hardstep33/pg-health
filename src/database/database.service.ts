@@ -337,7 +337,15 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
       host: c.host,
       port: c.port,
       database: c.database,
+      user: c.user,
     }));
+  }
+
+  /**
+   * Возвращает полную конфигурацию подключения (включая пароль) для формы редактирования
+   */
+  getConnectionById(id: string): DbConfig | undefined {
+    return this.getAllConfigs().find(c => c.id === id);
   }
 
   switchTo(id: string): { id: string; description: string } {

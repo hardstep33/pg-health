@@ -31,6 +31,9 @@ let ConnectionManagerController = class ConnectionManagerController {
     async update(id, dto) {
         return this.connectionManager.updateConnection(id, dto);
     }
+    async getById(id) {
+        return this.connectionManager.getConnectionById(id);
+    }
     async test(dto) {
         return this.connectionManager.testConnection(dto);
     }
@@ -67,6 +70,13 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], ConnectionManagerController.prototype, "update", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], ConnectionManagerController.prototype, "getById", null);
 __decorate([
     (0, common_1.Post)('test'),
     __param(0, (0, common_1.Body)()),

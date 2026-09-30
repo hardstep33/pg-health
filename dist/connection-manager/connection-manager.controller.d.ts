@@ -16,6 +16,7 @@ export declare class ConnectionManagerController {
         host: string;
         port: number;
         database: string;
+        user: string;
     }[];
     switch(id: string): {
         id: string;
@@ -23,6 +24,7 @@ export declare class ConnectionManagerController {
     };
     add(dto: CreateConnectionDto): Promise<import("../database/database.service").DbConfig>;
     update(id: string, dto: Partial<CreateConnectionDto>): Promise<import("../database/database.service").DbConfig>;
+    getById(id: string): Promise<import("../database/database.service").DbConfig>;
     test(dto: CreateConnectionDto): Promise<{
         success: boolean;
         message: string;

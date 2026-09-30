@@ -9,6 +9,7 @@ interface ConnectionItem {
     host: string;
     port: number;
     database: string;
+    user?: string;
 }
 
 const STORAGE_KEY = 'selected-connection-id';
@@ -35,6 +36,7 @@ const ConnectionSelector: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [switching, setSwitching] = useState(false);
     const [showManager, setShowManager] = useState(false);
+    const [editId, setEditId] = useState<string | null>(null);
     const [deletingId, setDeletingId] = useState<string | null>(null);
 
     const loadConnections = () => {
@@ -95,8 +97,26 @@ const ConnectionSelector: React.FC = () => {
         }
     };
 
-    const handleConnectionAdded = () => {
+    const handleConnectionSaved = () => {
         loadConnections();
+        // Если редактировали текущее подключение — обновим заголовок после перезагрузки данных
+    };
+
+    const handleOpenAdd = () => {
+        setEditId(null);
+        setShowManager(true);
+    };
+
+    const handleOpenEdit = () => {
+        const id = currentConnection?.id || connections[0]?.id;
+        if (!id) return;
+        setEditId(id);
+        setShowManager(true);
+    };
+
+    const handleCloseManager = () => {
+        setShowManager(false);
+        setEditId(null);
     };
 
     const handleDeleteConnection = async (id: string, event: React.MouseEvent) => {
@@ -122,7 +142,7 @@ const ConnectionSelector: React.FC = () => {
                 <span className="connection-label">Подключение:</span>
                 <span style={{ color: 'var(--error-red)', fontWeight: 500 }}>Нет доступных БД</span>
                 <button
-                    onClick={() => setShowManager(true)}
+                    onClick={handleOpenAdd}
                     style={{
                         marginLeft: '8px',
                         padding: '4px 12px',
@@ -135,6 +155,13 @@ const ConnectionSelector: React.FC = () => {
                 >
                     Добавить
                 </button>
+                {showManager && (
+                    <ConnectionManager
+                        editId={editId}
+                        onConnectionSaved={handleConnectionSaved}
+                        onClose={handleCloseManager}
+                    />
+                )}
             </div>
         );
     }
@@ -157,7 +184,7 @@ const ConnectionSelector: React.FC = () => {
                 </select>
                 {switching && <span className="connection-loading">⏳...</span>}
                 <button
-                    onClick={() => setShowManager(true)}
+                    onClick={handleOpenAdd}
                     style={{
                         marginLeft: '8px',
                         padding: '4px 12px',
@@ -170,6 +197,22 @@ const ConnectionSelector: React.FC = () => {
                     title="Добавить подключение"
                 >
                     +
+                </button>
+                <button
+                    onClick={handleOpenEdit}
+                    disabled={connections.length === 0}
+                    style={{
+                        marginLeft: '4px',
+                        padding: '4px 12px',
+                        borderRadius: '4px',
+                        border: 'none',
+                        backgroundColor: '#ffc107',
+                        color: '#333',
+                        cursor: 'pointer',
+                    }}
+                    title="Редактировать текущее подключение"
+                >
+                    ✎
                 </button>
                 <button
                     onClick={(e) => handleDeleteConnection(currentConnection?.id || connections[0]?.id, e)}
@@ -190,8 +233,9 @@ const ConnectionSelector: React.FC = () => {
             </div>
             {showManager && (
                 <ConnectionManager
-                    onConnectionAdded={handleConnectionAdded}
-                    onClose={() => setShowManager(false)}
+                    editId={editId}
+                    onConnectionSaved={handleConnectionSaved}
+                    onClose={handleCloseManager}
                 />
             )}
         </>

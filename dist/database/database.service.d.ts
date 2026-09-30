@@ -50,7 +50,9 @@ export declare class DatabaseService implements OnModuleInit, OnModuleDestroy {
         host: string;
         port: number;
         database: string;
+        user: string;
     }[];
+    getConnectionById(id: string): DbConfig | undefined;
     switchTo(id: string): {
         id: string;
         description: string;

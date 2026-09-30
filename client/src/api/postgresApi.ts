@@ -57,6 +57,13 @@ export const testConnection = (data: { description: string; host: string; port: 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
     });
+export const updateConnection = (id: string, data: { description: string; host: string; port: number; database: string; user: string; password: string }) =>
+    fetchJson(`/api/connections/update/${id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+    });
+export const getConnectionById = (id: string) => fetchJson(`/api/connections/${id}`);
 export const deleteConnection = (id: string) =>
     fetchJson(`/api/connections/delete/${id}`, {
         method: 'POST',
