@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { DatabaseService, CreateConnectionDto } from '../database/database.service';
 
 @Injectable()
@@ -30,6 +30,12 @@ export class ConnectionManagerService {
 
   updateConnection(id: string, dto: Partial<CreateConnectionDto>) {
     return this.dbService.updateConnection(id, dto);
+  }
+
+  getConnectionById(id: string) {
+    const cfg = this.dbService.getConnectionById(id);
+    if (!cfg) throw new NotFoundException(`Подключение ${id} не найдено`);
+    return cfg;
   }
 
   testConnection(dto: CreateConnectionDto) {
