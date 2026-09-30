@@ -179,9 +179,9 @@ const ConnectionSelector: React.FC = () => {
         setPickId('');
     };
 
-    // Горизонтальный ряд кнопок управления
+    // Вертикальный столбец кнопок управления (боковая панель статична по ширине)
     const actionButtons = (opts: { showEditTarget?: string | null }) => (
-        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '6px', marginLeft: '8px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: '4px', marginLeft: '8px' }}>
             <button
                 onClick={handleOpenAdd}
                 style={{ ...btnBase, backgroundColor: '#28a745' }}
@@ -267,7 +267,7 @@ const ConnectionSelector: React.FC = () => {
                             </option>
                         ))}
                     </select>
-                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '6px', marginLeft: '8px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: '4px', marginLeft: '8px' }}>
                         <button
                             onClick={handleConfirmPick}
                             disabled={!pickId || switching}
