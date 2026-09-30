@@ -36,6 +36,12 @@ let ConnectionManagerService = class ConnectionManagerService {
     updateConnection(id, dto) {
         return this.dbService.updateConnection(id, dto);
     }
+    getConnectionById(id) {
+        const cfg = this.dbService.getConnectionById(id);
+        if (!cfg)
+            throw new common_1.NotFoundException(`Подключение ${id} не найдено`);
+        return cfg;
+    }
     testConnection(dto) {
         return this.dbService.testConnection(dto.host, dto.port, dto.database, dto.user, dto.password);
     }

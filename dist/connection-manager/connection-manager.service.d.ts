@@ -8,6 +8,7 @@ export declare class ConnectionManagerService {
         host: string;
         port: number;
         database: string;
+        user: string;
     }[];
     switchTo(id: string): {
         id: string;
@@ -19,6 +20,7 @@ export declare class ConnectionManagerService {
     getCurrentId(): string | null;
     addConnection(dto: CreateConnectionDto): Promise<import("../database/database.service").DbConfig>;
     updateConnection(id: string, dto: Partial<CreateConnectionDto>): Promise<import("../database/database.service").DbConfig>;
+    getConnectionById(id: string): import("../database/database.service").DbConfig;
     testConnection(dto: CreateConnectionDto): Promise<{
         success: boolean;
         message: string;

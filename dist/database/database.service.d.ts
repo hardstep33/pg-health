@@ -25,6 +25,7 @@ export declare class DatabaseService implements OnModuleInit, OnModuleDestroy {
     private readonly logger;
     private readonly envPath;
     private configs;
+    private envCache;
     constructor(configService: ConfigService);
     private reloadEnvFile;
     onModuleInit(): Promise<void>;
@@ -49,7 +50,9 @@ export declare class DatabaseService implements OnModuleInit, OnModuleDestroy {
         host: string;
         port: number;
         database: string;
+        user: string;
     }[];
+    getConnectionById(id: string): DbConfig | undefined;
     switchTo(id: string): {
         id: string;
         description: string;
