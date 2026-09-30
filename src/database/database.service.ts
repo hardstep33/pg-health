@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/common';
+import { Injectable, OnModuleInit, OnModuleDestroy, Logger, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Pool } from 'pg';
 import * as fs from 'fs';
@@ -348,12 +348,51 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     return this.getAllConfigs().find(c => c.id === id);
   }
 
-  switchTo(id: string): { id: string; description: string } {
+  /**
+   * Переключение на подключение. Если пул не инициализирован (например,
+   * соединение недоступно), пытаемся создать его "на лету", чтобы можно было
+   * переключиться даже на неактивное соединение (для последующего редактирования).
+   */
+  async switchTo(id: string): Promise<{ id: string; description: string }> {
     const cfg = this.getAllConfigs().find(c => c.id === id);
-    if (!cfg) throw new Error(`Connection ${id} not found`);
-    if (!this.pools.has(id)) throw new Error(`Pool for ${id} not initialized`);
+    if (!cfg) throw new NotFoundException(`Подключение ${id} не найдено`);
+
+    if (!this.pools.has(id)) {
+      try {
+        await this.createPool(cfg);
+      } catch (err) {
+        // Пул создать не удалось (БД недоступна) — всё равно разрешаем
+        // переключение, чтобы пользователь мог отредактировать параметры.
+        this.logger.warn(
+          `Pool for ${cfg.description} (${id}) is not available: ${err.message}. Switching anyway for editing.`,
+        );
+      }
+    }
+
     this.currentId = id;
     return { id: cfg.id, description: cfg.description };
+  }
+
+  private async createPool(cfg: DbConfig): Promise<void> {
+    const pool = new Pool({
+      host: cfg.host,
+      port: cfg.port,
+      database: cfg.database,
+      user: cfg.user,
+      password: cfg.password,
+      connectionTimeoutMillis: 5000,
+      idleTimeoutMillis: 30000,
+      max: 10,
+    });
+    try {
+      const client = await pool.connect();
+      client.release();
+      this.pools.set(cfg.id, pool);
+      this.logger.log(`Pool created for ${cfg.description} (${cfg.id})`);
+    } catch (err) {
+      await pool.end();
+      throw err;
+    }
   }
 
   getCurrentId(): string | null {

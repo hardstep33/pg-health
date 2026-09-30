@@ -18,10 +18,12 @@ export declare class ConnectionManagerController {
         database: string;
         user: string;
     }[];
-    switch(id: string): {
+    switch(id: string): Promise<{
         id: string;
         description: string;
-    };
+    } | {
+        error: any;
+    }>;
     add(dto: CreateConnectionDto): Promise<import("../database/database.service").DbConfig>;
     update(id: string, dto: Partial<CreateConnectionDto>): Promise<import("../database/database.service").DbConfig>;
     getById(id: string): Promise<import("../database/database.service").DbConfig>;

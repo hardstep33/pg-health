@@ -22,8 +22,13 @@ let ConnectionManagerController = class ConnectionManagerController {
     list() {
         return this.connectionManager.getConnectionList();
     }
-    switch(id) {
-        return this.connectionManager.switchTo(id);
+    async switch(id) {
+        try {
+            return await this.connectionManager.switchTo(id);
+        }
+        catch (err) {
+            return { error: err?.message || 'Не удалось переключить подключение' };
+        }
     }
     async add(dto) {
         return this.connectionManager.addConnection(dto);
@@ -53,7 +58,7 @@ __decorate([
     __param(0, (0, common_1.Body)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], ConnectionManagerController.prototype, "switch", null);
 __decorate([
     (0, common_1.Post)('add'),
