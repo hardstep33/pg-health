@@ -10,10 +10,10 @@ export declare class ConnectionManagerService {
         database: string;
         user: string;
     }[];
-    switchTo(id: string): {
+    switchTo(id: string): Promise<{
         id: string;
         description: string;
-    };
+    }>;
     getCurrentDataSource(): {
         query: (text: string, params?: any[]) => Promise<any[]>;
     };

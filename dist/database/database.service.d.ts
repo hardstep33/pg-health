@@ -53,10 +53,11 @@ export declare class DatabaseService implements OnModuleInit, OnModuleDestroy {
         user: string;
     }[];
     getConnectionById(id: string): DbConfig | undefined;
-    switchTo(id: string): {
+    switchTo(id: string): Promise<{
         id: string;
         description: string;
-    };
+    }>;
+    private createPool;
     getCurrentId(): string | null;
     query<T = any>(text: string, params?: any[]): Promise<T[]>;
 }

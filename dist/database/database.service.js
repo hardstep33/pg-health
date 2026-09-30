@@ -298,14 +298,42 @@ let DatabaseService = DatabaseService_1 = class DatabaseService {
     getConnectionById(id) {
         return this.getAllConfigs().find(c => c.id === id);
     }
-    switchTo(id) {
+    async switchTo(id) {
         const cfg = this.getAllConfigs().find(c => c.id === id);
         if (!cfg)
-            throw new Error(`Connection ${id} not found`);
-        if (!this.pools.has(id))
-            throw new Error(`Pool for ${id} not initialized`);
+            throw new common_1.NotFoundException(`Подключение ${id} не найдено`);
+        if (!this.pools.has(id)) {
+            try {
+                await this.createPool(cfg);
+            }
+            catch (err) {
+                this.logger.warn(`Pool for ${cfg.description} (${id}) is not available: ${err.message}. Switching anyway for editing.`);
+            }
+        }
         this.currentId = id;
         return { id: cfg.id, description: cfg.description };
+    }
+    async createPool(cfg) {
+        const pool = new pg_1.Pool({
+            host: cfg.host,
+            port: cfg.port,
+            database: cfg.database,
+            user: cfg.user,
+            password: cfg.password,
+            connectionTimeoutMillis: 5000,
+            idleTimeoutMillis: 30000,
+            max: 10,
+        });
+        try {
+            const client = await pool.connect();
+            client.release();
+            this.pools.set(cfg.id, pool);
+            this.logger.log(`Pool created for ${cfg.description} (${cfg.id})`);
+        }
+        catch (err) {
+            await pool.end();
+            throw err;
+        }
     }
     getCurrentId() {
         return this.currentId;
